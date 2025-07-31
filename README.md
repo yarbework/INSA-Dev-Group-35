@@ -11,7 +11,7 @@ This project is developed with the goal of making positive impact on educational
 ### 2. Students performance tracking 
 	- by applying simple grading and time tracking, students performance can be evaluated 
 
-### 3. Applying computer vision to control cheating in online exam 
+### 3. Applying computer vision to control cheating in online exam (If possible)
 
 ### 4. Students attendance tracking  by adding simply daily or weekly strikes 
 ### 5. Instructors can create quizes and give access to limited users (students)
