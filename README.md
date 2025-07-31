@@ -23,7 +23,7 @@ This project is developed with the goal of making positive impact on educational
 * **Tailwind CSS** a utility-first CSS framework for rapid UI development
 
 ### Back end : 
-* **Node.js** A JavaScript runtime environment to build (back end) server side app
+* **Node.js** A JavaScript runtime environment to build (back end) server side app 
 * **MongoDB** a NoSQL database that provides high performance, high availability, and easy scalability
 * **Express.js**
 
