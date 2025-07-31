@@ -22,7 +22,7 @@ This project is developed with the goal of making positive impact on educational
 * **TypeScript** a statically typed Superset of JavaScript that adds type safety to your code.
 * **Tailwind CSS** a utility-first CSS framework for rapid UI development
 
-###Back end : 
+### Back end : 
 * **Node.js** A JavaScript runtime environment to build (back end) server side app
 * **MongoDB** a NoSQL database that provides high performance, high availability, and easy scalability
 * **Express.js**
