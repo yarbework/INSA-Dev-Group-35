@@ -1,7 +1,7 @@
 # INSA-Dev-Group-35
-# EdTech & Social Impact
+## EdTech & Social Impact
+# Online Quiz App with Timer 
 
-##Online Quiz App with Timer 
 This project is developed with the goal of making positive impact on educational sector. By using latest technologies we will try to develop personalized, secured, performance tracked , ease to use and user friendly web app. 
 
 #Features 
