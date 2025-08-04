@@ -6,7 +6,7 @@ function Button() {
   return (
     <button
       onClick={() => navigate("Login")}
-      className="border-3 border-amber-200 px-5 py-1 rounded-xl hover:text-white hover:bg-amber-300 transition-colors duration-200"
+      className="border-3 border-blue-600 px-5 py-1 rounded-xl hover:text-white hover:bg-blue-600 transition-colors duration-200"
     >
       Login
     </button>
@@ -16,7 +16,7 @@ function Button() {
 export default function Header() {
   return (
     <>
-      <header className="w-full flex flex-row justify-between p-10 font-sans font-bold mb-0">
+      <header className="w-full flex flex-row justify-between p-7 font-sans font-bold mb-0">
         <h1>Logo</h1>
 
         <nav className="flex gap-20">
