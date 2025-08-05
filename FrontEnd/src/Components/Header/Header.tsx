@@ -17,8 +17,7 @@ import { Link } from "react-router-dom";
 //   { href: "/login", label: "Login" },
 //   { href: "/signUp", label: "SignUp" },
 // ];
-import Buttons from "../buttons";
-
+import Buttons from "../Buttons";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
