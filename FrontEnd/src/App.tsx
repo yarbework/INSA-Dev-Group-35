@@ -6,16 +6,23 @@ import Login from "./Pages/Login";
 import SignUp from "./Pages/signUp";
 import Exam from "./Pages/Exam";
 import About from "./Pages/About";
+import CreateQuiz from "./Pages/CreateQuiz";
+import NavLayout from "./components/NavLayout";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/exams" element={<Exam />} />
-        <Route path="/about" element={<About />} />
+        {/* The following navLayout contains header and footer which is included to home, exam and about page */}
+        <Route path="/" element={<NavLayout />}>
+          <Route index element={<Home />} />
+          <Route path="exams" element={<Exam />} />
+          <Route path="about" element={<About />} />
+        </Route>
+        {/* The following statements are without header and footer */}
         <Route path="/login" element={<Login />} />
         <Route path="/signUp" element={<SignUp />} />
+        <Route path="/createQuiz" element={<CreateQuiz />} />
       </Routes>
     </BrowserRouter>
   );
