@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 // ];
 import Buttons from "../Buttons";
 
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
@@ -35,9 +36,11 @@ export default function Header() {
             <li className="hover:text-blue-700 transition-colors">
               <Link to="/">Home</Link>
             </li>
+
             <li className="hover:text-blue-700 transition-colors">
               <Link to="../exams">Exams</Link>
             </li>
+
             <li className="hover:text-blue-700 transition-colors">
               <Link to="../about">About us</Link>
             </li>
@@ -46,6 +49,7 @@ export default function Header() {
           {/* <LoginButton /> */}
           <Buttons />
         </nav>
+
         {/* mobile navigation */}
         <div className="md:hidden">
           <button
@@ -72,17 +76,21 @@ export default function Header() {
         {/* mobile menu */}
         {isMenuOpen && (
           <nav className="absolute top-full left-0 w-full bg-white border-b border-gray-200 md:hidden">
+
             <ul className="flex flex-col gap-6 items-center p-6 text-gray-600 font-semibold">
+
               <li className="hover:text-blue-600 transition-colors">
                 <Link to="/" onClick={() => setIsMenuOpen(false)}>
                   Home
                 </Link>
               </li>
+
               <li className="hover:text-blue-600 transition-colors">
                 <Link to="../exams" onClick={() => setIsMenuOpen(false)}>
                   Exams
                 </Link>
               </li>
+              
               <li className="hover:text-blue-600 transition-colors">
                 <Link to="../about" onClick={() => setIsMenuOpen(false)}>
                   About us
