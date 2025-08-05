@@ -8,7 +8,7 @@ function Home() {
     <>
 
       <Header/>
-      <div>Home</div>
+      <div className="h-screen">Home</div>
       <Footer/>
     </>
   );
