@@ -7,7 +7,7 @@ import SignUp from "./Pages/signUp";
 import Exam from "./Pages/Exam";
 import About from "./Pages/About";
 import CreateQuiz from "./Pages/CreateQuiz";
-import NavLayout from "./components/NavLayout";
+import NavLayout from "./Components/NavLayout";
 
 export default function App() {
   return (
