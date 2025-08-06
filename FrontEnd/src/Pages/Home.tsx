@@ -1,3 +1,4 @@
+
 import { ChevronDown } from "lucide-react";
 import Header from "../Components/Header/Header";
 import image from "../../public/home.jpg";
@@ -30,8 +31,8 @@ function Home() {
           </div>
         </div>
       </div>
-    </>
-  );
-}
 
+
+</>)
+}
 export default Home;
