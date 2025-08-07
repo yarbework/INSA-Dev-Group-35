@@ -4,7 +4,12 @@ function Buttons() {
   const navigate = useNavigate();
   const buttonData = [
     { key: "Login", label: "Login", path: "/login", styleType: "secondary" },
-    { key: "SignUp", label: "SignUp", path: "/signUp", styleType: "primary" },
+    {
+      key: "createQuiz",
+      label: "Create Quize",
+      path: "/CreateQuiz",
+      styleType: "primary",
+    },
   ] as const;
 
   const buttonStyles = {
