@@ -3,6 +3,7 @@ import image from "../../public/home.jpg";
 function Home() {
   return (
     <>
+      {/* Home page with background image and text */}
       <div
         style={{ backgroundImage: `url(${image})`, backgroundSize: "cover" }}
       >
