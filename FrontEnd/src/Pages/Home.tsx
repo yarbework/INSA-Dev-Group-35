@@ -1,12 +1,16 @@
+
 import { ChevronDown } from "lucide-react";
+
 import image from "../../public/home.jpg";
 function Home() {
   return (
     <>
+
       {/* Home page with background image and text */}
-      <div
-        style={{ backgroundImage: `url(${image})`, backgroundSize: "cover" }}
-      >
+
+      
+       <div className={`bg-cover bg-center bg-[url('${image}')]`}>
+      
         <div className="max-w-5xl mx-auto flex flex-col justify-center h-screen px-10 py-20 ">
           <h1 className="text-5xl mb-10">
             Learn <br /> new concepts <br /> for each question
@@ -21,6 +25,7 @@ function Home() {
               Start Learning
             </button>
 
+
             <a href="" className="flex text-yellow-300 px-4 py-2 rounded mt-4">
               {" "}
               <ChevronDown />
@@ -31,5 +36,19 @@ function Home() {
       </div>
     </>
   );
+
+
+            <a href="" className="flex text-yellow-300 px-4 py-2 rounded mt-4">
+              {" "}
+              <ChevronDown />
+              know more
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+</>)
+
 }
 export default Home;
