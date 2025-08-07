@@ -1,12 +1,15 @@
 
 import { ChevronDown } from "lucide-react";
-import Header from "../Components/Header/Header";
 import image from "../../public/home.jpg";
+
+
 function Home() {
   return (
+
     <>
-      <Header />
+
       <div
+      
         style={{ backgroundImage: `url(${image})`, backgroundSize: "cover" }}
       >
         <div className="max-w-5xl mx-auto flex flex-col justify-center h-screen px-10 py-20 ">
