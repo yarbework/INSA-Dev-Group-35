@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
-import AIFeedback from "../../public/undraw_chat-with-ai_ir62.svg";
-import LearnFromAnywhere from "../../public/undraw_online-test_cqv0.svg";
-import TeachingOnline from "../../public/undraw_online-learning_tgmv.svg";
-import OnlineTest from "../../public/undraw_online-survey_xq2g.svg";
+import AIFeedback from "../assets/images/undraw_chat-with-ai_ir62.svg";
+import LearnFromAnywhere from "../assets/images/undraw_online-learning_tgmv.svg";
+import TeachingOnline from "../assets/images/undraw_online-survey_xq2g.svg";
+import OnlineTest from "../assets/images/undraw_online-test_cqv0.svg";
 
 function More() {
   const [toggleWidth, setToggleWidth] = useState(true);
 
   useEffect(() => {
-    // to set the initial state when the page loads 
+    // to set the initial state when the page loads
     if (window.innerWidth <= 768) {
       setToggleWidth(false);
     } else {
@@ -37,14 +37,25 @@ function More() {
         <div>
           <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
           <p className="text-sm mb-4">
-            This app was built to help both teachers and students stay connected and engaged with learning — even outside of school hours. Whether it’s after class, on weekends, or during school breaks, students can stay on track while teachers stay informed.
+            This app was built to help both teachers and students stay connected
+            and engaged with learning — even outside of school hours. Whether
+            it’s after class, on weekends, or during school breaks, students can
+            stay on track while teachers stay informed.
           </p>
           <p className="text-sm mb-4">
-            The goal is simple: to support learning <strong>anytime, anywhere</strong>, and make sure <strong>no student falls behind</strong>.
+            The goal is simple: to support learning{" "}
+            <strong>anytime, anywhere</strong>, and make sure{" "}
+            <strong>no student falls behind</strong>.
           </p>
         </div>
 
-        {toggleWidth && <img src={LearnFromAnywhere} alt="Learn from anywhere" className="w-72 h-auto" />}
+        {toggleWidth && (
+          <img
+            src={LearnFromAnywhere}
+            alt="Learn from anywhere"
+            className="w-72 h-auto"
+          />
+        )}
       </section>
 
       <section className="mb-10">
@@ -59,31 +70,46 @@ function More() {
         </ul>
         <div className="flex flex-row justify-between gap-20 items-center">
           <p className="text-sm mb-4 max-w-xl">
-            This allows teachers to monitor understanding and give better support — even when they’re not in the classroom with their students.
+            This allows teachers to monitor understanding and give better
+            support — even when they’re not in the classroom with their
+            students.
           </p>
 
-          {toggleWidth && <img src={TeachingOnline} alt="Online teaching" className="w-72 h-auto" />}
+          {toggleWidth && (
+            <img
+              src={TeachingOnline}
+              alt="Online teaching"
+              className="w-72 h-auto"
+            />
+          )}
         </div>
       </section>
 
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">For Students</h2>
         <p className="text-sm mb-4">
-          This app gives students the tools to <strong>take charge of their own learning</strong>.
+          This app gives students the tools to{" "}
+          <strong>take charge of their own learning</strong>.
         </p>
         <ul className="list-disc list-inside text-sm pl-5 mb-4">
           <li>Access quizzes from any of their teachers</li>
           <li>Receive instant feedback after each quiz</li>
           <li>View correct answers and explanations</li>
-          <li>Track their progress over time — including scores, speed, accuracy, and improvement</li>
+          <li>
+            Track their progress over time — including scores, speed, accuracy,
+            and improvement
+          </li>
           <li>Identify their weak areas and focus on them</li>
         </ul>
       </section>
 
       <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Powered by AI for Smarter Learning</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          Powered by AI for Smarter Learning
+        </h2>
         <p className="text-sm mb-4">
-          Our app uses <strong>Artificial Intelligence (AI)</strong> to help students grow faster and more effectively.
+          Our app uses <strong>Artificial Intelligence (AI)</strong> to help
+          students grow faster and more effectively.
         </p>
         <div className="mb-10 flex flex-row flex-wrap justify-between items-center gap-8">
           <ul className="list-disc list-inside text-sm pl-5 mb-4 max-w-md">
@@ -91,13 +117,19 @@ function More() {
             <li>Detects patterns in mistakes or slow responses</li>
             <li>Suggests areas to review based on the student’s results</li>
             <li>Gives personalized feedback after each quiz</li>
-            <li>Recommends specific practice questions to improve weak areas</li>
+            <li>
+              Recommends specific practice questions to improve weak areas
+            </li>
           </ul>
 
-          {toggleWidth && <img src={AIFeedback} alt="AI feedback" className="w-72 h-auto" />}
+          {toggleWidth && (
+            <img src={AIFeedback} alt="AI feedback" className="w-72 h-auto" />
+          )}
         </div>
         <p className="text-sm mb-4">
-          This means every student gets a <strong>personalized learning experience</strong>, just like having a smart study coach that knows exactly what they need to work on.
+          This means every student gets a{" "}
+          <strong>personalized learning experience</strong>, just like having a
+          smart study coach that knows exactly what they need to work on.
         </p>
       </section>
 
@@ -124,26 +156,40 @@ function More() {
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Why This Matters</h2>
         <p className="text-sm mb-4">
-          In traditional classrooms, it’s hard to tell if students are studying effectively when they’re not at school. This app solves that by:
+          In traditional classrooms, it’s hard to tell if students are studying
+          effectively when they’re not at school. This app solves that by:
         </p>
         <div className="flex flex-row justify-between gap-20 items-center">
           <ul className="list-disc list-inside text-sm pl-5 mb-4 max-w-xl">
-            <li>Giving teachers <strong>visibility into student learning</strong></li>
-            <li>Giving students <strong>control over their learning path</strong></li>
-            <li>Providing <strong>data-backed feedback and support</strong></li>
+            <li>
+              Giving teachers <strong>visibility into student learning</strong>
+            </li>
+            <li>
+              Giving students <strong>control over their learning path</strong>
+            </li>
+            <li>
+              Providing <strong>data-backed feedback and support</strong>
+            </li>
           </ul>
 
-          {toggleWidth && <img src={OnlineTest} alt="Online test" className="w-60 h-auto" />}
+          {toggleWidth && (
+            <img src={OnlineTest} alt="Online test" className="w-60 h-auto" />
+          )}
         </div>
 
         <p className="text-sm mb-4">
-          It’s not just about testing — it’s about <strong>continuous improvement</strong>.
+          It’s not just about testing — it’s about{" "}
+          <strong>continuous improvement</strong>.
         </p>
       </section>
 
       <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Built for the Future of Learning</h2>
-        <p className="text-sm mb-4">We’re actively improving the platform. Here’s what’s coming soon:</p>
+        <h2 className="text-2xl font-semibold mb-4">
+          Built for the Future of Learning
+        </h2>
+        <p className="text-sm mb-4">
+          We’re actively improving the platform. Here’s what’s coming soon:
+        </p>
         <ul className="list-disc list-inside text-sm pl-5 mb-4">
           <li>Leaderboards and friendly challenges</li>
           <li>Study streaks and achievements</li>
@@ -155,10 +201,13 @@ function More() {
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Join Us</h2>
         <p className="text-sm mb-4">
-          Whether you're a teacher who wants to support your students better, or a student who wants to improve smarter, this app is here for you.
+          Whether you're a teacher who wants to support your students better, or
+          a student who wants to improve smarter, this app is here for you.
         </p>
         <p className="text-sm">
-          Together, let’s make learning more <strong>connected, personalized, and effective</strong> — no matter where you are.
+          Together, let’s make learning more{" "}
+          <strong>connected, personalized, and effective</strong> — no matter
+          where you are.
         </p>
       </section>
     </div>
@@ -185,7 +234,8 @@ export default function About() {
         <section className="mb-10">
           <h2 className="text-3xl mb-4 font-semibold">Our Mission</h2>
           <p className="text-sm">
-            <span className="text-yellow-300 font-bold">|</span> Our mission is to empower learners by providing accessible and engaging educational
+            <span className="text-yellow-300 font-bold">|</span> Our mission is
+            to empower learners by providing accessible and engaging educational
             resources that inspire curiosity and growth.
           </p>
         </section>
@@ -195,30 +245,44 @@ export default function About() {
           <ul className="list-disc list-inside text-sm pl-5">
             <li>Accessibility: Learning should be available to everyone.</li>
             <li>Engagement: We create interactive content that captivates.</li>
-            <li>Integrity: We uphold honesty and transparency in our resources.</li>
+            <li>
+              Integrity: We uphold honesty and transparency in our resources.
+            </li>
           </ul>
         </section>
 
         <section className="mb-10">
-          <h2 className="text-3xl mb-4 font-semibold">What You Should Expect</h2>
+          <h2 className="text-3xl mb-4 font-semibold">
+            What You Should Expect
+          </h2>
           <p className="text-sm mb-4">
-            This quiz app is designed to strengthen learning beyond the classroom by helping teachers and students stay connected, even when school is not in session.
+            This quiz app is designed to strengthen learning beyond the
+            classroom by helping teachers and students stay connected, even when
+            school is not in session.
           </p>
           <p className="text-sm mb-4">
-            Teachers can create and share quizzes with their students, helping to monitor progress and ensure everyone is following along with lessons.
+            Teachers can create and share quizzes with their students, helping
+            to monitor progress and ensure everyone is following along with
+            lessons.
           </p>
-          <p className="text-sm mb-4">Students can access quizzes released by multiple teachers, allowing them to:</p>
+          <p className="text-sm mb-4">
+            Students can access quizzes released by multiple teachers, allowing
+            them to:
+          </p>
           <ul className="list-disc list-inside text-sm pl-5 mb-4">
             <li>Practice key concepts from their lessons</li>
             <li>Get instant feedback on their performance</li>
             <li>Review at their own pace, anytime and anywhere</li>
           </ul>
           <p className="text-sm">
-            This app empowers both teachers and students with the tools they need for active, flexible, and focused learning.
+            This app empowers both teachers and students with the tools they
+            need for active, flexible, and focused learning.
           </p>
         </section>
 
-        {showMore && <More />}
+        <div hidden={!showMore}>
+          <More />
+        </div>
 
         <div className="flex items-center justify-center mt-10">
           <button
@@ -227,7 +291,9 @@ export default function About() {
             aria-expanded={showMore}
             aria-controls="more-content"
           >
-            <ChevronDown className={`${showMore ? "rotate-180" : ""} transition-transform`} />
+            <ChevronDown
+              className={`${showMore ? "rotate-180" : ""} transition-transform`}
+            />
             {!showMore ? "Learn More" : "Show less"}
           </button>
         </div>
