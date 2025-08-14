@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom"; // first we have installed React-router-=dom
+import { Link } from "react-router-dom";
+// import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [loginData, setLoginData] = useState({
