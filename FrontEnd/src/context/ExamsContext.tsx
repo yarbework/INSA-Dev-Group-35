@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
-import type { Quiz } from "../components/quiz/QuizCard";
+import type { Quiz } from "../components/quiz/QuizCard"; // Ensure path is correct
 
 // export type NewQuizPayload = Omit<Quiz, "id" | "author">;
 
@@ -11,11 +11,10 @@ export type NewQuizPayload = {
   timeLimit: number;
   privacy: "public" | "private";
   password?: string;
-  questionCount: number;
   questions: {
     questionText: string;
     options: { text: string }[];
-    correctAnswerIndex: number;
+    correctAnswerIndex: number | null;
   }[];
 };
 

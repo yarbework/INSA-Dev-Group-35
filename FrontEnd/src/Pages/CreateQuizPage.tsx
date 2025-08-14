@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExams } from "../context/ExamsContext";
 
+// Type definitions for the form's local state
 type Option = {
   text: string;
 };
@@ -120,17 +121,16 @@ const CreateQuizPage: React.FC = () => {
       const payload = {
         title: quizTitle,
         subject,
+        questionsCount: questions.length,
         difficulty,
         timeLimit,
         privacy,
         password: privacy === "private" ? password : undefined,
-        questionCount: questions.length,
-        // the following section Map questions to the expected format
         questions: questions.map(
           ({ questionText, options, correctAnswerIndex }) => ({
             questionText,
             options,
-            correctAnswerIndex: correctAnswerIndex as number,
+            correctAnswerIndex,
           })
         ),
       };
