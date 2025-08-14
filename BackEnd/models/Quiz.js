@@ -7,7 +7,7 @@ const OptionSchema = new mongoose.Schema({
 const QuestionSchema = new mongoose.Schema({
   questionText: { type: String, required: true },
   options: [OptionSchema],
-  CorrectAnswerIndex: { type: Number, required: true },
+  correctAnswerIndex: { type: Number, required: true },
 });
 
 const QuizSchema = new mongoose.Schema(
@@ -15,7 +15,7 @@ const QuizSchema = new mongoose.Schema(
     title: { type: String, required: true },
     subject: { type: String, required: true },
     author: { type: String, default: "Admin" },
-    defficulty: {
+    difficulty: {
       type: String,
       required: true,
       enum: ["Easy", "Medium", "Hard"],
@@ -24,18 +24,19 @@ const QuizSchema = new mongoose.Schema(
     timeLimit: { type: Number, required: true }, // this is in minutes
     privacy: {
       type: String,
-      enum: ["piblic", "private"],
+      enum: ["public", "private"],
       default: "public",
       required: true,
     },
     password: { type: String },
     questions: [QuestionSchema],
+    questionCount: { type: Number, required: true },
   },
   { timestamps: true }
 );
 
-QuizSchema.virtual("questionCount").get(function () {
-  return this.questions.length;
-});
+// QuizSchema.virtual("questionCount").get(function () {
+//   return this.questions.length;
+// });
 
 module.exports = mongoose.model("Quiz", QuizSchema);
