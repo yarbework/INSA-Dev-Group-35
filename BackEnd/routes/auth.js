@@ -3,9 +3,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const router = express.Router();
+const {loginLimiter, signUpLimiter} = require("../middlewares/rate_limiter")
 
 // Register route
-router.post("/signup", async (req, res) => {
+router.post("/signup", signUpLimiter ,async (req, res) => {
   try {
     const { username, email, password } = req.body;
     // Check if user already exists
@@ -36,7 +37,7 @@ router.post("/signup", async (req, res) => {
 
 // Login route
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginLimiter ,async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
