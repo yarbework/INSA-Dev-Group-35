@@ -8,13 +8,14 @@ export type NewQuizPayload = {
   title: string;
   subject: string;
   difficulty: "Easy" | "Medium" | "Hard";
-  timeLimit: number; 
+  timeLimit: number;
   privacy: "public" | "private";
   password?: string;
+  questionCount: number;
   questions: {
     questionText: string;
     options: { text: string }[];
-    correctAnswerIndex: number | null; // I have added this to match the QuizCard type
+    correctAnswerIndex: number; 
   }[];
 };
 
