@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
-import type { Quiz } from "../components/quiz/QuizCard"; // Ensure path is correct
+import type { Quiz } from "../components/quiz/QuizCard";
 
 // export type NewQuizPayload = Omit<Quiz, "id" | "author">;
 
@@ -8,13 +8,13 @@ export type NewQuizPayload = {
   title: string;
   subject: string;
   difficulty: "Easy" | "Medium" | "Hard";
-  timeLimit: number;
+  timeLimit: number; 
   privacy: "public" | "private";
   password?: string;
   questions: {
     questionText: string;
     options: { text: string }[];
-    correctAnswerIndex: number | null;
+    correctAnswerIndex: number | null; // I have added this to match the QuizCard type
   }[];
 };
 
@@ -60,7 +60,10 @@ export const ExamsProvider: React.FC<{ children: ReactNode }> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newExamPayload),
       });
-      if (!response.ok) throw new Error("Failed to create the exam.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || "Failed to create the exam.");
+      }
       const createdExam: Quiz = await response.json();
       setExams((prevExams) => [createdExam, ...prevExams]);
     } catch (err: any) {

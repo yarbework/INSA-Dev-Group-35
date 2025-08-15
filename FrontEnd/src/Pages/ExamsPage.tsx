@@ -6,7 +6,7 @@ import { useExams } from "../context/ExamsContext";
 
 const ExamsPage: React.FC = () => {
   const { exams, loading, error } = useExams();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   // This logic groups quizzes by subject. e.g., { Programming: [...], History: [...] }
   const groupedExams = useMemo(() => {
@@ -20,14 +20,7 @@ const ExamsPage: React.FC = () => {
   }, [exams]); // Re-calculates only when the exams array changes
 
   const handleStartQuiz = (quiz: Quiz) => {
-    // NOTE: For a real app, you would fetch the full quiz with questions here,
-    // as the initial GET request doesn't include them for performance.
-    // For now, this is a placeholder. We will need to create a new API endpoint like GET /api/exams/:id
-    alert(
-      `Starting quiz "${quiz.title}". Navigation to quiz page needs to be implemented after fetching full quiz data.`
-    );
-    // Example navigation:
-    // navigate(`/quiz/${quiz._id}`);
+    // Navigate to the quiz page with the quiz ID
     navigate(`/quiz/${quiz._id}`);
   };
 
