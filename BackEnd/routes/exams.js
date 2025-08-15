@@ -24,4 +24,17 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Get a quiz by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+    if (!quiz) {
+      return res.status(404).json({ msg: "Quiz not found" });
+    }
+    res.json(quiz);
+  } catch (err) {
+    // Handle errors related to invalid ObjectId format
+    res.status(500).send("Server Error");
+  }
+});
 module.exports = router;

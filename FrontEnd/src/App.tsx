@@ -9,6 +9,7 @@ import Login from "./Pages/Login";
 import SignUp from "./Pages/signUp";
 import Exam from "./Pages/ExamsPage";
 import About from "./Pages/About";
+import QuizPage from "./Pages/QuizPage";
 import CreateQuiz from "./Pages/CreateQuizPage";
 import NavLayout from "./components/NavLayout";
 
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signUp" element={<SignUp />} />
             <Route path="/createQuiz" element={<CreateQuiz />} />
+            <Route path="/quiz/:quizId" element={<QuizPage />} />
           </Routes>
         </ExamsProvider>
       </AuthProvider>
