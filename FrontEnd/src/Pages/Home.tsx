@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-
+import { Link } from "react-router-dom";
 import image from "../assets/images/home.jpg";
 
 function Home() {
@@ -25,7 +25,7 @@ function Home() {
             <a href="" className="flex text-yellow-300 px-4 py-2 rounded mt-4">
               {" "}
               <ChevronDown />
-              know more
+              <Link to="../about">know more</Link>
             </a>
           </div>
         </div>
