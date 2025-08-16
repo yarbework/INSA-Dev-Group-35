@@ -121,7 +121,7 @@ const CreateQuizPage: React.FC = () => {
       const payload = {
         title: quizTitle,
         subject,
-        questionsCount: questions.length,
+        questionCount: questions.length,
         difficulty,
         timeLimit,
         privacy,
@@ -130,7 +130,7 @@ const CreateQuizPage: React.FC = () => {
           ({ questionText, options, correctAnswerIndex }) => ({
             questionText,
             options,
-            correctAnswerIndex,
+            correctAnswerIndex: correctAnswerIndex as number,
           })
         ),
       };
