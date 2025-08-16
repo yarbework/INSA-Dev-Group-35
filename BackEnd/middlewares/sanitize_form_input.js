@@ -50,15 +50,6 @@ export const sanitizeMiddleware = (req, res, next) => {
     req.body.role = ""
   }
 
-
-
-  req.sanitizedQuery = req.query ? sanitizeObject(req.query) : {};
-  if (req.params) req.params = sanitizeObject(req.params);
-
-  if (typeof req.params === "object") {
-    req.params = {}
-  }
-
   next();
 };
 
