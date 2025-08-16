@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -7,6 +8,9 @@ const SignUp = () => {
     password: "",
     role: "Student", // default role
   });
+
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -18,10 +22,36 @@ const SignUp = () => {
     }));
   };
 
-  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
     console.log("Form submitted:", formData);
-    // Here we can send the data to backend after backend is done
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/auth/signup",
+        {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+        },
+        { withCredentials: true }
+      );
+
+      console.log(response.data);
+    } catch (err: any) {
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(`Registration failed: ${err.response.data.message}`);
+      } else {
+        setError(
+          "Registration failed: Please check your details and try again. Make sure your email is valid and your password is at least 6 characters."
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -30,6 +60,13 @@ const SignUp = () => {
         <h2 className="text-2xl font-bold text-blue-700 mb-6 text-center">
           QuizGeek Registration
         </h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
@@ -107,9 +144,12 @@ const SignUp = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            disabled={isLoading}
+            className={`w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
+              isLoading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            Register
+            {isLoading ? "Registering..." : "Register"}
           </button>
         </form>
 

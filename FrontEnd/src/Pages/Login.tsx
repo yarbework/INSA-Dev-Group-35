@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom"; // first we have installed React-router-=dom
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
   const [loginData, setLoginData] = useState({
@@ -24,14 +25,16 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Here we can typically call our authentication API after backend is set up
-      console.log("Login attempt with:", loginData);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await axios.post(
+        "http://localhost:4000/api/auth/login",
+        {
+          email: loginData.email,
+          password: loginData.password,
+        },
+        { withCredentials: true }
+      );
 
-      // On successful login, this would typically:
-      // - Store the auth token
-      // - Redirect to dashboard/home
+      console.log(response.data);
     } catch (err) {
       setError("Invalid email or password");
     } finally {
