@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser")
+const {sanitizeMiddleware} = require("./middlewares/sanitize_form_input")
 
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser())
+app.use(sanitizeMiddleware)
 
 // Database (MongoDB)connection
 
@@ -23,7 +25,7 @@ mongoose.connect(MONGO_URI, {})
   .then(() => console.log("MongoDB connected successfully"))
   .catch((err) => console.error(err));
 
-//API Routes
+//API Routes 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/exams", require("./routes/exams"));
 

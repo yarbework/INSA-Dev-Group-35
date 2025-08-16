@@ -3,11 +3,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const router = express.Router();
+const { sanitizeBody } = require("../middlewares/sanitize_form_input")
 
 const {loginLimiter, signUpLimiter} = require("../middlewares/rate_limiter")
 
 // Register route
-router.post("/signup", signUpLimiter ,async (req, res) => {
+router.post("/signup", signUpLimiter, sanitizeBody ,async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
     // Check if user already exists
@@ -33,15 +34,15 @@ router.post("/signup", signUpLimiter ,async (req, res) => {
     await user.save();
     res.status(201).json({ msg: "User registered successfully" });
   } catch (err) {
-     console.log(err)
-    res.status(500).send("Server Error");
+     next(err)
+    // res.status(500).send("Server Error");
   }
 
 });
 
 // Login route
 
-router.post("/login", loginLimiter ,async (req, res) => {
+router.post("/login", loginLimiter, sanitizeBody ,async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
@@ -73,8 +74,8 @@ router.post("/login", loginLimiter ,async (req, res) => {
       }
     );
   } catch (err) {
-   
-    res.status(500).send("Server Error");
+    next(err)
+    // res.status(500).send("Server Error");
   }
 });
 
