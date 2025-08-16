@@ -1,0 +1,9 @@
+POST  http://localhost:5173/signUp
+[
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123"
+]
+
+###
+// JSON authoriaztion not authentication
