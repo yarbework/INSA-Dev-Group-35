@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -35,6 +37,10 @@ const Login = () => {
       );
 
       console.log(response.data);
+
+      if (response.data.success) {
+        navigate("/");
+      }
     } catch (err) {
       setError("Invalid email or password");
     } finally {

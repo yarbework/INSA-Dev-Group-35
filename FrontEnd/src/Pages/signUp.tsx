@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const SignUp = () => {
@@ -11,6 +12,8 @@ const SignUp = () => {
 
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -26,21 +29,20 @@ const SignUp = () => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-    console.log("Form submitted:", formData);
 
     try {
       const response = await axios.post(
         "http://localhost:4000/api/auth/signup",
-        {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        },
+        formData,
         { withCredentials: true }
       );
+      console.log(response.data.success);
+      console.log(response.data.msg);
 
-      console.log(response.data);
+      // 🔹 Navigate to login if signup succeeded
+      if (response.data.success) {
+        navigate("/Login?success=1");
+      }
     } catch (err: any) {
       if (err.response && err.response.data && err.response.data.message) {
         setError(`Registration failed: ${err.response.data.message}`);
@@ -155,7 +157,7 @@ const SignUp = () => {
 
         <p className="mt-4 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <a href="/Login" className="text-blue-600 hover:underline">
+          <a href="/login" className="text-blue-600 hover:underline">
             Login
           </a>
         </p>
