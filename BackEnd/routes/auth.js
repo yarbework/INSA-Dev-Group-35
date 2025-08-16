@@ -3,14 +3,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const router = express.Router();
+
 const {loginLimiter, signUpLimiter} = require("../middlewares/rate_limiter")
 
 // Register route
 router.post("/signup", signUpLimiter ,async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     // Check if user already exists
-    if (!username || !email || !password)
+    if (!name || !email || !password || !role)
       return res
         .status(400)
         .json({ msg: "All fields are required: Please fill all fields" });
@@ -24,15 +25,18 @@ router.post("/signup", signUpLimiter ,async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     user = new User({
-      username,
+      username: name,
       email,
       password: hashedPassword,
+      role
     });
     await user.save();
     res.status(201).json({ msg: "User registered successfully" });
   } catch (err) {
+     console.log(err)
     res.status(500).send("Server Error");
   }
+
 });
 
 // Login route
@@ -55,16 +59,21 @@ router.post("/login", loginLimiter ,async (req, res) => {
         .status(400)
         .json({ msg: "Invalid credentials: Incorrect password" });
     const payload = { user: { id: user.id } };
+
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: "1h" },
+      { expiresIn: "1h",
+        httpOnly:true, //js can not access it
+        sameSite: "lax" // for csrf protection
+       },
       (err, token) => {
         if (err) throw err;
         res.json({ token });
       }
     );
   } catch (err) {
+   
     res.status(500).send("Server Error");
   }
 });
