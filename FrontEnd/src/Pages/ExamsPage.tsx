@@ -1,12 +1,16 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { QuizCard } from "../components/quiz/QuizCard";
 import type { Quiz } from "../components/quiz/QuizCard";
 import { useExams } from "../context/ExamsContext";
+import { PasswordPromptModal } from "../components/PasswordPromptModal";
 
 const ExamsPage: React.FC = () => {
   const { exams, loading, error } = useExams();
   const navigate = useNavigate();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
 
   // This logic groups quizzes by subject. e.g., { Programming: [...], History: [...] }
   const groupedExams = useMemo(() => {
@@ -20,15 +24,25 @@ const ExamsPage: React.FC = () => {
   }, [exams]); // Re-calculates only when the exams array changes
 
   const handleStartQuiz = (quiz: Quiz) => {
-    // NOTE: For a real app, you would fetch the full quiz with questions here,
-    // as the initial GET request doesn't include them for performance.
-    // For now, this is a placeholder. We will need to create a new API endpoint like GET /api/exams/:id
-    alert(
-      `Starting quiz "${quiz.title}". Navigation to quiz page needs to be implemented after fetching full quiz data.`
-    );
-    // Example navigation:
-    // navigate(`/quiz/${quiz._id}`);
-    navigate(`/quiz/${quiz._id}`);
+    // Navigate to the quiz page with the quiz ID
+    if (quiz.privacy === "public") {
+      navigate(`/quiz/${quiz._id}`);
+    } else {
+      setSelectedQuiz(quiz);
+      setIsModalOpen(true); // Open the password prompt modal if the quiz is private
+    }
+  };
+
+  // Function to handle password submission from the modal
+
+  const handlePasswordSubmit = (enteredPassword: string) => {
+    if (selectedQuiz && enteredPassword === selectedQuiz.password) {
+      setIsModalOpen(false); // Close the modal if the password is correct
+      navigate(`/quiz/${selectedQuiz._id}`); // Navigate to the quiz page
+      setSelectedQuiz(null); // Reset selected quiz
+    } else {
+      alert("Incorrect password. Please try again."); // Alert user if password is incorrect
+    }
   };
 
   // Render a loading spinner while fetching data
@@ -53,44 +67,54 @@ const ExamsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <header className="mb-10 text-center">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-            Available Exams
-          </h1>
-          <p className="mt-3 text-lg text-gray-500">
-            Select a quiz to test your knowledge.
-          </p>
-        </header>
+    <>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+          <header className="mb-10 text-center">
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+              Available Exams
+            </h1>
+            <p className="mt-3 text-lg text-gray-500">
+              Select a quiz to test your knowledge.
+            </p>
+          </header>
 
-        {Object.keys(groupedExams).length > 0 ? (
-          <div className="space-y-12">
-            {Object.entries(groupedExams).map(([subject, quizzes]) => (
-              <section key={subject}>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-gray-200">
-                  {subject}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                  {quizzes.map((quiz) => (
-                    <QuizCard
-                      key={quiz._id}
-                      quiz={quiz}
-                      onStart={() => handleStartQuiz(quiz)}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center text-gray-500 mt-20">
-            <p className="text-xl">No exams available at the moment.</p>
-            <p>Why not create one?</p>
-          </div>
-        )}
+          {Object.keys(groupedExams).length > 0 ? (
+            <div className="space-y-12">
+              {Object.entries(groupedExams).map(([subject, quizzes]) => (
+                <section key={subject}>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-gray-200">
+                    {subject}
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {quizzes.map((quiz) => (
+                      <QuizCard
+                        key={quiz._id}
+                        quiz={quiz}
+                        onStart={() => handleStartQuiz(quiz)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 mt-20">
+              <p className="text-xl">No exams available at the moment.</p>
+              <p>Why not create one?</p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+      {selectedQuiz && (
+        <PasswordPromptModal
+          isOpen={isModalOpen}
+          quizTitle={selectedQuiz.title}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handlePasswordSubmit}
+        />
+      )}
+    </>
   );
 };
 
