@@ -16,4 +16,5 @@ export const signUpLimiter = rateLimit({
     limit: 10,
     statusCode: 429,
     message: {message: "Too many signUp attempts, please try again later"}
+    
 })
