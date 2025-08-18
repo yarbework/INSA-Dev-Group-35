@@ -6,11 +6,14 @@ const router = express.Router();
 
 const {loginLimiter, signUpLimiter} = require("../middlewares/rate_limiter")
 
-// Register route
+// ==================
+// REGISTRTION ROUTE
+//===================
+
 router.post("/signup", signUpLimiter ,async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    // Check if user already exists
+
     if (!name || !email || !password || !role)
       return res
         .status(400)
@@ -42,7 +45,9 @@ router.post("/signup", signUpLimiter ,async (req, res) => {
 
 });
 
-// Login route
+//======================
+// LOGIN ROUTE
+//======================
 
 router.post("/login", loginLimiter, async (req, res) => {
   try {
@@ -60,15 +65,15 @@ router.post("/login", loginLimiter, async (req, res) => {
 
     const payload = { user: { id: user.id } };
 
-    // generate JWT
+
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    // send token in HTTP-only cookie
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // set to true if using HTTPS
+      secure: false, 
       sameSite: "lax",
-      maxAge: 60 * 60 * 1000, // 1 hour
+      maxAge: 60 * 60 * 1000, 
     });
 
     res.json({ msg: "Login successful", success: true });
@@ -78,10 +83,41 @@ router.post("/login", loginLimiter, async (req, res) => {
   }
 });
 
+//================================
+//LOGOUTE ROUTE
+//================================
+
 
 router.post("/logout", (req, res) => {
   res.clearCookie("token");
   res.json({ msg: "Logged out successfully" });
 });
+
+
+//===========================
+// LOGIN ATHENTICATION ROUTE
+//===========================
+router.get("/me", (req, res) =>{
+  const token = req.cookies.token
+
+  
+
+
+  if (!token){
+    return res.status(401).json(({loggedIn: false}))
+  }
+
+  try{
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      
+      return res.json({loggedIn: true, user: decoded})
+      
+  }
+  catch{
+    console.log("REQ.USER =", req.user);
+    
+
+  }
+})
 
 module.exports = router;
