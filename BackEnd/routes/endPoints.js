@@ -97,27 +97,69 @@ router.post("/logout", (req, res) => {
 //===========================
 // LOGIN ATHENTICATION ROUTE
 //===========================
-router.get("/me", (req, res) =>{
-  const token = req.cookies.token
 
-  
+router.get("/me", async (req, res) => {
+  const token = req.cookies.token;
 
+  if (!token) {
+    return res.status(401).json({ loggedIn: false });
+  }
+
+  try {
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.user.id).select("username role");
+    console.log(user)
+
+    if (!user) {
+      return res.status(404).json({ loggedIn: false });
+    }
+
+    return res.json({ loggedIn: true, user });
+  } catch (err) {
+    console.error("Error in /me:", err.message);
+    return res.status(401).json({ loggedIn: false });
+  }
+});
+
+
+
+//==========================
+// save score in the data
+//==========================
+
+
+router.put("/score", async (req, res) =>{
+
+  const token = req.cookies.token;
 
   if (!token){
-    return res.status(401).json(({loggedIn: false}))
+    return res.status(401).json({msg: "not loged in or user does not exist"})
   }
 
-  try{
-      const decoded = jwt.verify(token, process.env.JWT_SECRET)
-      
-      return res.json({loggedIn: true, user: decoded})
-      
-  }
-  catch{
-    console.log("REQ.USER =", req.user);
+  try {
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+    const {subject, difficulty, score} = req.body
+    const user = user.findById(decoded.user.id)
+
+    if(!user){
+      res.status(404).json({msg: "user not found"})
+    }
+
+    user.score.push({subject, difficulty, score})
+
+    await user.save()
+
+    res.json({msg: "Score added successfully", scores: user.scores })
     
-
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({msg: "unknow error"})
   }
-})
+
+} )
+
 
 module.exports = router;

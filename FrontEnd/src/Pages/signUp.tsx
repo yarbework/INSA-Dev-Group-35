@@ -32,7 +32,7 @@ const SignUp = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/auth/signup",
+        "http://localhost:4000/api/endPoints/signup",
         formData,
         { withCredentials: true }
       );
