@@ -25,7 +25,7 @@ mongoose.connect(MONGO_URI, {})
   .catch((err) => console.error(err));
 
 //API Routes
-app.use("/api/auth", require("./routes/auth"));
+app.use("/api/endPoints", require("./routes/endPoints"));
 app.use("/api/exams", require("./routes/exams"));
 
 app.listen(PORT, () =>

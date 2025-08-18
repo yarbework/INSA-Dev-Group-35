@@ -22,11 +22,11 @@ function Home() {
               Start Learning
             </button>
 
-            <a href="" className="flex text-yellow-300 px-4 py-2 rounded mt-4">
+            <div className="flex text-yellow-300 px-4 py-2 rounded mt-4">
               {" "}
               <ChevronDown />
               <Link to="../about">know more</Link>
-            </a>
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
+import axios from "axios";
 
 import AIFeedback from "../assets/images/undraw_chat-with-ai_ir62.svg";
 import LearnFromAnywhere from "../assets/images/undraw_online-learning_tgmv.svg";

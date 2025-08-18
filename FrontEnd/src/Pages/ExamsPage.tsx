@@ -80,13 +80,13 @@ const ExamsPage: React.FC = () => {
           </header>
 
           {Object.keys(groupedExams).length > 0 ? (
-            <div className="space-y-12">
+            <div className="space-y-12 flex flex-row flex-wrap gap-5 ">
               {Object.entries(groupedExams).map(([subject, quizzes]) => (
                 <section key={subject}>
                   <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-gray-200">
                     {subject}
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  <div className=" min-w-[325px]">
                     {quizzes.map((quiz) => (
                       <QuizCard
                         key={quiz._id}

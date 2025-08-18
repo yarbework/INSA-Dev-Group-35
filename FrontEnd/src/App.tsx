@@ -11,7 +11,7 @@ import Exam from "./Pages/ExamsPage";
 import About from "./Pages/About";
 import QuizPage from "./Pages/QuizPage";
 import CreateQuiz from "./Pages/CreateQuizPage";
-import NavLayout from "./components/NavLayout";
+import NavLayout from "./Components/NavLayout";
 
 export default function App() {
   return (
