@@ -109,7 +109,7 @@ router.get("/me", async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.user.id).select("username role");
-    console.log(user)
+    // console.log(user)
 
     if (!user) {
       return res.status(404).json({ loggedIn: false });
@@ -142,7 +142,7 @@ router.put("/score", async (req, res) =>{
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
     const {subject, difficulty, score} = req.body
-    const user = user.findById(decoded.user.id)
+    const user = await user.findById(decoded.user.id)
 
     if(!user){
       res.status(404).json({msg: "user not found"})
