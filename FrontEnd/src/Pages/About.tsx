@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
-import axios from "axios";
+// import axios from "axios";
+import PageWrapper from "../Components/wrapper/PageWrapper";
 
 import AIFeedback from "../assets/images/undraw_chat-with-ai_ir62.svg";
 import LearnFromAnywhere from "../assets/images/undraw_online-learning_tgmv.svg";
@@ -228,77 +229,83 @@ export default function About() {
   };
 
   return (
-    <div className="bg-white">
-      <div className="max-w-5xl mx-auto flex flex-col justify-center min-h-screen px-10 py-20">
-        <h1 className="text-5xl mb-10 text-center font-bold">About Us</h1>
+    <PageWrapper>
+      <div className="bg-white">
+        <div className="max-w-5xl mx-auto flex flex-col justify-center min-h-screen px-10 py-20">
+          <h1 className="text-5xl mb-10 text-center font-bold">About Us</h1>
 
-        <section className="mb-10">
-          <h2 className="text-3xl mb-4 font-semibold">Our Mission</h2>
-          <p className="text-sm">
-            <span className="text-yellow-300 font-bold">|</span> Our mission is
-            to empower learners by providing accessible and engaging educational
-            resources that inspire curiosity and growth.
-          </p>
-        </section>
+          <section className="mb-10">
+            <h2 className="text-3xl mb-4 font-semibold">Our Mission</h2>
+            <p className="text-sm">
+              <span className="text-yellow-300 font-bold">|</span> Our mission
+              is to empower learners by providing accessible and engaging
+              educational resources that inspire curiosity and growth.
+            </p>
+          </section>
 
-        <section className="mb-10">
-          <h2 className="text-3xl mb-4 font-semibold">Our Values</h2>
-          <ul className="list-disc list-inside text-sm pl-5">
-            <li>Accessibility: Learning should be available to everyone.</li>
-            <li>Engagement: We create interactive content that captivates.</li>
-            <li>
-              Integrity: We uphold honesty and transparency in our resources.
-            </li>
-          </ul>
-        </section>
+          <section className="mb-10">
+            <h2 className="text-3xl mb-4 font-semibold">Our Values</h2>
+            <ul className="list-disc list-inside text-sm pl-5">
+              <li>Accessibility: Learning should be available to everyone.</li>
+              <li>
+                Engagement: We create interactive content that captivates.
+              </li>
+              <li>
+                Integrity: We uphold honesty and transparency in our resources.
+              </li>
+            </ul>
+          </section>
 
-        <section className="mb-10">
-          <h2 className="text-3xl mb-4 font-semibold">
-            What You Should Expect
-          </h2>
-          <p className="text-sm mb-4">
-            This quiz app is designed to strengthen learning beyond the
-            classroom by helping teachers and students stay connected, even when
-            school is not in session.
-          </p>
-          <p className="text-sm mb-4">
-            Teachers can create and share quizzes with their students, helping
-            to monitor progress and ensure everyone is following along with
-            lessons.
-          </p>
-          <p className="text-sm mb-4">
-            Students can access quizzes released by multiple teachers, allowing
-            them to:
-          </p>
-          <ul className="list-disc list-inside text-sm pl-5 mb-4">
-            <li>Practice key concepts from their lessons</li>
-            <li>Get instant feedback on their performance</li>
-            <li>Review at their own pace, anytime and anywhere</li>
-          </ul>
-          <p className="text-sm">
-            This app empowers both teachers and students with the tools they
-            need for active, flexible, and focused learning.
-          </p>
-        </section>
+          <section className="mb-10">
+            <h2 className="text-3xl mb-4 font-semibold">
+              What You Should Expect
+            </h2>
+            <p className="text-sm mb-4">
+              This quiz app is designed to strengthen learning beyond the
+              classroom by helping teachers and students stay connected, even
+              when school is not in session.
+            </p>
+            <p className="text-sm mb-4">
+              Teachers can create and share quizzes with their students, helping
+              to monitor progress and ensure everyone is following along with
+              lessons.
+            </p>
+            <p className="text-sm mb-4">
+              Students can access quizzes released by multiple teachers,
+              allowing them to:
+            </p>
+            <ul className="list-disc list-inside text-sm pl-5 mb-4">
+              <li>Practice key concepts from their lessons</li>
+              <li>Get instant feedback on their performance</li>
+              <li>Review at their own pace, anytime and anywhere</li>
+            </ul>
+            <p className="text-sm">
+              This app empowers both teachers and students with the tools they
+              need for active, flexible, and focused learning.
+            </p>
+          </section>
 
-        <div hidden={!showMore}>
-          <More />
-        </div>
+          <div hidden={!showMore}>
+            <More />
+          </div>
 
-        <div className="flex items-center justify-center mt-10">
-          <button
-            className="flex text-yellow-300 px-4 py-2 rounded mt-4 hover:bg-yellow-200 transition"
-            onClick={handleClick}
-            aria-expanded={showMore}
-            aria-controls="more-content"
-          >
-            <ChevronDown
-              className={`${showMore ? "rotate-180" : ""} transition-transform`}
-            />
-            {!showMore ? "Learn More" : "Show less"}
-          </button>
+          <div className="flex items-center justify-center mt-10">
+            <button
+              className="flex text-yellow-300 px-4 py-2 rounded mt-4 hover:bg-yellow-200 transition"
+              onClick={handleClick}
+              aria-expanded={showMore}
+              aria-controls="more-content"
+            >
+              <ChevronDown
+                className={`${
+                  showMore ? "rotate-180" : ""
+                } transition-transform`}
+              />
+              {!showMore ? "Learn More" : "Show less"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

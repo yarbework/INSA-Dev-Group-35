@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { QuizCard } from "../components/quiz/QuizCard";
 import type { Quiz } from "../components/quiz/QuizCard";
 import { useExams } from "../context/ExamsContext";
-import { PasswordPromptModal } from "../components/PasswordPromptModal";
+import PageWrapper from "../Components/wrapper/PageWrapper";
+import { PasswordPromptModal } from "../Components/PasswordPromptModal";
 
 const ExamsPage: React.FC = () => {
   const { exams, loading, error } = useExams();
@@ -67,7 +68,7 @@ const ExamsPage: React.FC = () => {
   }
 
   return (
-    <>
+    <PageWrapper>
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto p-4 sm:p-6 lg:p-8">
           <header className="mb-10 text-center">
@@ -114,7 +115,7 @@ const ExamsPage: React.FC = () => {
           onSubmit={handlePasswordSubmit}
         />
       )}
-    </>
+    </PageWrapper>
   );
 };
 
