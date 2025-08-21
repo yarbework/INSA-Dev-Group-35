@@ -16,7 +16,7 @@ interface ResultsData{
     quizTitle: string;
     totalQuestions: number;
   correctAnswersCount: number;
-  fullQuiz: QuizWithQuestions; // This will contain the questions with correct answers
+  fullQuiz: QuizWithQuestions; // This will contain the questions with correct answers from stricter type
     userAnswers: (number| null)[];
 }
 
@@ -46,7 +46,7 @@ const ResultsPage: React.FC = () => {
     const percentage = totalQuestions > 0 ? Math.round((correctAnswersCount/totalQuestions)*100) : 0;
     
     //renders nothing to avoid errors, when the data is not ready.
-    if (!results || !fullQuiz || !fullQuiz.questions){
+    if (!results){
         return null;
     }
     const quiz = fullQuiz; 

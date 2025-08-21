@@ -41,7 +41,7 @@ const QuizPage: React.FC = () => {
     const checkLoginAndFetch = async () => {
       try {
         // 1. Check login
-        await axios.get(`http://localhost:4000/api/endPoints/me`, {
+        await axios.get(`${API_URL}/endPoints/me`, {
           withCredentials: true,
         });
 
