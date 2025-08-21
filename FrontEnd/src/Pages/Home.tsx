@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import PageWrapper from "../Components/wrapper/PageWrapper";
-import image from "../assets/images/home.jpg";
+// import image from "../assets/images/home.jpg";
 
 export default function Home() {
   return (

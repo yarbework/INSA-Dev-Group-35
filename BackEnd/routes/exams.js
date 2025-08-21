@@ -26,23 +26,17 @@ router.post("/", async (req, res) => {
 // Get quiz by ID (only questions with IDs, no correct answers)
 router.get("/:id", async (req, res) => {
   try {
-    const quiz = await Quiz.findById(req.params.id);
+    const quiz = await Quiz.findById(req.params.id).lean();//lean() makes it a plain js object
     if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
 
-    // Send questions with IDs only, no correctAnswerIndex
-    const questionsToSend = quiz.questions.map((q) => ({
-      id: q._id,
-      questionText: q.questionText,
-      options: q.options.map((opt) => ({ id: opt._id, text: opt.text })),
-    }));
+    // Send questions with IDs only, no correctAnswerIndex(sanitization)
+    const questionsForStudent = quiz.questions.map((q) => {
+      const {correctAnswerIndex, ...questionWithoutAnswer} = q;
+      return questionWithoutAnswer;
+    });
 
     res.json({
-      id: quiz._id,
-      title: quiz.title,
-      subject: quiz.subject,
-      difficulty: quiz.difficulty,
-      timeLimit: quiz.timeLimit,
-      questions: questionsToSend,
+      ...quiz, questions: questionsForStudent,
     });
   } catch (err) {
     res.status(500).send("Server Error");
@@ -52,25 +46,32 @@ router.get("/:id", async (req, res) => {
 // Submit quiz answers
 router.post("/:id/submit", async (req, res) => {
   try {
+
+    //I getting full quiz with answers 
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
+    
+    //II. Get user's answer
+    const userAnswers = req.body.answers; // array: { questionId, selectedOptionId }
 
-    const submittedAnswers = req.body.answers; // array: { questionId, selectedOptionId }
+    let correctAnswersCount = 0;
 
-    let score = 0;
-    const results = submittedAnswers.map(({ questionId, selectedOptionId }) => {
-      const question = quiz.questions.find((q) => q._id.toString() === questionId);
-      if (!question) return { questionId, correct: false };
-
-      const correctOption = question.options[question.correctAnswerIndex];
-      const correct = correctOption._id.toString() === selectedOptionId;
-      if (correct) score += 1;
-
-      return { questionId, correct };
-    });
-
-    res.json({ score, total: quiz.questions.length, results });
+    //III. Comparing answers and calculation
+quiz.questions.forEach((question, index) => {
+  if (question.correctAnswerIndex === userAnswers[index]){
+    correctAnswersCount++;
+  }
+})
+//send a complete result 
+    res.json({ 
+      quizTitle: quiz.title,
+      totalQuestions: quiz.questions.length,
+      correctAnswersCount,
+      fullQuiz: quiz,
+      userAnswers,
+     });
   } catch (err) {
+    console.error("Error submitting quiz:", err)
     res.status(500).send("Server Error");
   }
 });

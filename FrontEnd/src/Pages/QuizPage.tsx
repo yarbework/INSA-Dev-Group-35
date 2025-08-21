@@ -22,6 +22,8 @@ type FullQuiz = BaseQuiz & {
   questions: QuizQuestion[];
 };
 
+
+const API_URL = 'http://localhost:4000/api';
 const QuizPage: React.FC = () => {
   const navigate = useNavigate();
   const { quizId } = useParams<{ quizId: string }>();
@@ -105,34 +107,36 @@ const QuizPage: React.FC = () => {
     setMarkedQuestions(newMarked);
   };
 
-  const handleFinish = async () => {
-    if (!quiz) return;
+  const handleFinish =  async() => {
     const answeredCount = answers.filter((a) => a !== null).length;
     const confirmation = window.confirm(
-      `You have answered ${answeredCount} out of ${quiz.questions.length} questions. Are you sure you want to finish?`
+      `You have answered ${answeredCount} out of ${quiz?.questions.length} questions. Are you sure you want to finish?`
     );
-    if (!confirmation) return;
+    if (confirmation) {
+      try {
+        //sending the answer to new backend endpoint
+        const response = await fetch (`${API_URL}/exams/${quizId}/submit`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({answers: answers}) //this can send answers array
+        })
+        if (!response.ok){
+          throw new Error("Failed to submit your answers.")
+        }
+        const resultsData = await response.json();
+        navigate('/quiz/results', {state: {results: resultsData}})
+      } catch (err){
+        console.error("Submission failed", err)
+        alert("There was an error submitting your quiz, Please try again.")
+      }
 
-    try {
-      const payload = shuffledQuestions.map((q, i) => ({
-        questionId: q.id,
-        selectedOptionIndex: answers[i],
-      }));
-
-      const { data: result } = await axios.post(
-        `http://localhost:4000/api/exams/${quizId}/submit`,
-        { answers: payload },
-        { withCredentials: true }
-      );
-
-      alert(
-        `Quiz submitted! You scored ${result.score} / ${quiz.questions.length}`
-      );
-      navigate("/exams");
-    } catch (err: any) {
-      alert(err.message || "Failed to submit quiz.");
     }
+
   };
+
+    
 
   const handleTimeUp = () => {
     alert("Time's up! Your quiz will be submitted automatically.");
