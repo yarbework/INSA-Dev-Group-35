@@ -1,69 +1,89 @@
-import { ChevronDown } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCircle, BarChart2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import PageWrapper from "../Components/wrapper/PageWrapper";
+import FeatureCard from '../Components/FeatureCard';
+import {useAuth} from '../context/AuthContext';
+import Image from "../images/Homepageimage1.jpg";
+// import { section } from "framer-motion/client";
 // import image from "../assets/images/home.jpg";
 
 export default function Home() {
+
+  const {isAuthenticated} = useAuth();
+
   return (
     <PageWrapper>
-      <div className="bg-white min-h-screen flex flex-col justify-center items-center p-10">
-        <h1 className="text-5xl font-extrabold text-black mb-5 animate__animated animate__fadeInDown">
-          Learn <br /> New Concepts <br /> for Each Question
-        </h1>
-        <p className="text-lg text-gray-800 mb-5 animate__animated animate__fadeInUp">
-          <span className="font-bold">|</span> We help you prepare for exams and
-          quizzes
-        </p>
-        <div className="flex space-x-4 animate__animated animate__fadeIn">
-          <Link to="/exams">
-            <button className="bg-gradient-to-r from-yellow-500 to-red-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:opacity-80 transition duration-300 transform hover:scale-105">
-              Start Learning
-            </button>
-          </Link>
-          <Link
-            to="../about"
-            className="flex items-center text-gray-800 hover:underline"
-          >
-            <ChevronDown className="mr-2" />
-            Know More
-          </Link>
-        </div>
-      </div>
+      <section className="bg-white text-gray-900"> 
+        <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between p-8 lg:p-16">
+          {/* Text Left side */}
+          <div className="lg:w-1/2 text-center lg:text-left mb-12 lg:mb-0 animate__animated animate__fadeInLeft">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">Master New Concepts with Every Question</h1>
+            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0"> Elevate your learning with interactive quizzes, track your progress, and achieve your academic goals. Your journey to knowledge starts here.</p>
+            
+            <div className="flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+              {/* Dynamic call to action */}
+              {isAuthenticated ? (
+                <Link 
+                to="/exams"
+                className="inline-block bg-blue-600 text-white text-lg font-semibold px-8 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105">
+                Go to Exams
+                <ArrowRight className="inline-block ml-2" size={20}/>
+                </Link>
 
-      <div className="max-w-5xl mx-auto p-6 mt-10">
-        <h2 className="text-3xl font-bold text-black text-center mb-6">
-          Why Choose Us?
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gray-100 p-6 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:shadow-lg">
-            <h3 className="text-xl font-semibold text-black mb-3">
-              Personalized Learning
-            </h3>
-            <p className="text-gray-700">
-              Our platform adapts to your learning style and pace, ensuring a
-              customized experience.
-            </p>
+              ) :(
+                <Link 
+                to="/signup" 
+                className="inline-block bg-blue-600 text-white text-lg font-semibold px-8 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105">
+                  Get Started for Free 
+                  <ArrowRight className="inline-block ml-2" size={20}/>
+                </Link>
+              )}
+            </div>
           </div>
-          <div className="bg-gray-100 p-6 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:shadow-lg">
-            <h3 className="text-xl font-semibold text-black mb-3">
-              Engaging Quizzes
-            </h3>
-            <p className="text-gray-700">
-              Enjoy interactive quizzes that keep you engaged and motivated to
-              learn more.
-            </p>
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:shadow-lg">
-            <h3 className="text-xl font-semibold text-black mb-3">
-              Instant Feedback
-            </h3>
-            <p className="text-gray-700">
-              Receive immediate feedback on your performance to help you
-              identify areas for improvement.
-            </p>
+          {/* Image Right Side */}
+          <div className="lg:w-5/12 animate__animated animate__fadeInRight">
+            <div className="bg-gray-100 rounded-lg p-8 border">
+              <img src={Image} alt="students taking quiz" className="w-full h-auto"/>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+      {/* Features */}
+      <section className="bg-gray-50 py-20">
+        <div className="container mx-auto px-6"> 
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900"> Why Students Love Our Platform</h2>
+            <p className="text-lg text-gray-600 mt-3">Everything you need to prepare, practice, and perform.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <FeatureCard 
+            icon={<BookOpen size={32}/>}
+            title="Personlized Learning"
+            description="Contribute your Own quizzes and challenge others. Our platform adapts to your learning style and pace."/>
+            <FeatureCard 
+            icon={<CheckCircle size={32}/>}
+            title="Instant Feedback"
+            description="Receive immediate, detailed feedback on your performance to help you identify strengths and weaknesses."/>
+            <FeatureCard 
+            icon={<BarChart2 size={32}/>}
+            title="Performance Tracking"
+            description="Monitor your progress over time with a personal dashboard and detailed analytics for every exam"/>
+          </div>
+        </div>
+      </section>
+      {!isAuthenticated && (
+        <section className="bg-white py-20">
+          <div className="container mx-auto text-center">
+            <h2 className="text-3xl font-bold text-gray-900">Ready to Start Learning?</h2>
+            <p className="text-lg text-gray-600 my-4">Create an account to join our community of learners today.</p>
+            <Link to="/signup"
+            className="inline-block bg-blue-600 text-white text-lg font-semibold px-10 py-4 rounded-lg shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105 mt-4">
+             Sign Up Now
+            </Link>
+          </div>
+        </section>
+      )}
+
     </PageWrapper>
   );
 }
