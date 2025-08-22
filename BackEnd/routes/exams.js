@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Quiz = require("../models/Quiz");
 
-// Get all quizzes (without questions)
 router.get("/", async (req, res) => {
   try {
     const quizzes = await Quiz.find().select("-questions");
@@ -12,7 +11,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Create a new quiz
+
 router.post("/", async (req, res) => {
   try {
     const newQuiz = new Quiz(req.body);
@@ -23,54 +22,50 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Get quiz by ID (only questions with IDs, no correct answers)
 router.get("/:id", async (req, res) => {
   try {
-    const quiz = await Quiz.findById(req.params.id);
+    const quiz = await Quiz.findById(req.params.id).lean();
     if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
 
-    // Send questions with IDs only, no correctAnswerIndex
-    const questionsToSend = quiz.questions.map((q) => ({
-      id: q._id,
-      questionText: q.questionText,
-      options: q.options.map((opt) => ({ id: opt._id, text: opt.text })),
-    }));
+    const questionsForStudent = quiz.questions.map((q) => {
+      const {correctAnswerIndex, ...questionWithoutAnswer} = q;
+      return questionWithoutAnswer;
+    });
 
     res.json({
-      id: quiz._id,
-      title: quiz.title,
-      subject: quiz.subject,
-      difficulty: quiz.difficulty,
-      timeLimit: quiz.timeLimit,
-      questions: questionsToSend,
+      ...quiz, questions: questionsForStudent,
     });
   } catch (err) {
     res.status(500).send("Server Error");
   }
 });
 
-// Submit quiz answers
 router.post("/:id/submit", async (req, res) => {
   try {
+
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
+    
+    const userAnswers = req.body.answers; 
 
-    const submittedAnswers = req.body.answers; // array: { questionId, selectedOptionId }
+    let correctAnswersCount = 0;
 
-    let score = 0;
-    const results = submittedAnswers.map(({ questionId, selectedOptionId }) => {
-      const question = quiz.questions.find((q) => q._id.toString() === questionId);
-      if (!question) return { questionId, correct: false };
 
-      const correctOption = question.options[question.correctAnswerIndex];
-      const correct = correctOption._id.toString() === selectedOptionId;
-      if (correct) score += 1;
+quiz.questions.forEach((question, index) => {
+  if (question.correctAnswerIndex === userAnswers[index]){
+    correctAnswersCount++;
+  }
+})
 
-      return { questionId, correct };
-    });
-
-    res.json({ score, total: quiz.questions.length, results });
+    res.json({ 
+      quizTitle: quiz.title,
+      totalQuestions: quiz.questions.length,
+      correctAnswersCount,
+      fullQuiz: quiz,
+      userAnswers,
+     });
   } catch (err) {
+    console.error("Error submitting quiz:", err)
     res.status(500).send("Server Error");
   }
 });
