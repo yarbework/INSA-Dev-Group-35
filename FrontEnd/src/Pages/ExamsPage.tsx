@@ -25,7 +25,16 @@ const ExamsPage: React.FC = () => {
   }, [exams]); // Re-calculates only when the exams array changes
 
   const handleStartQuiz = (quiz: Quiz) => {
+
+    //before navigating ensure the quiz and its _id exist
+    if (!quiz || !quiz._id){
+      console.error("Attempted to start a quiz with an invalid ID")
+      alert("Sorry, there was an error starting this quiz.")
+      return;
+    }
+
     // Navigate to the quiz page with the quiz ID
+
     if (quiz.privacy === "public") {
       navigate(`/quiz/${quiz._id}`);
     } else {
@@ -39,7 +48,10 @@ const ExamsPage: React.FC = () => {
   const handlePasswordSubmit = (enteredPassword: string) => {
     if (selectedQuiz && enteredPassword === selectedQuiz.password) {
       setIsModalOpen(false); // Close the modal if the password is correct
-      navigate(`/quiz/${selectedQuiz._id}`); // Navigate to the quiz page
+      
+      if (selectedQuiz._id){
+        navigate(`/quiz/${selectedQuiz._id}`);
+      } // Navigate to the quiz page after ensuring its presence
       setSelectedQuiz(null); // Reset selected quiz
     } else {
       alert("Incorrect password. Please try again."); // Alert user if password is incorrect

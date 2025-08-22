@@ -27,6 +27,7 @@ router.get("/:id", async (req, res) => {
     const quiz = await Quiz.findById(req.params.id).lean();
     if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
 
+
     const questionsForStudent = quiz.questions.map((q) => {
       const {correctAnswerIndex, ...questionWithoutAnswer} = q;
       return questionWithoutAnswer;
@@ -43,12 +44,15 @@ router.get("/:id", async (req, res) => {
 router.post("/:id/submit", async (req, res) => {
   try {
 
+
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
     
     const userAnswers = req.body.answers; 
 
     let correctAnswersCount = 0;
+
+
 
 
 quiz.questions.forEach((question, index) => {
