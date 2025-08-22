@@ -252,7 +252,7 @@ export default function Header() {
                     <li className="w-full">
                       <button
                         onClick={() => logout(setUser)}
-                        className="w-full block px-4 py-2 rounded-lg text-center hover:bg-blue-100 transition-all duration-200"
+                        className="text-black w-full block px-4 py-2 rounded-lg text-center  hover:bg-blue-100 transition-all duration-200 "
                       >
                         Logout
                       </button>

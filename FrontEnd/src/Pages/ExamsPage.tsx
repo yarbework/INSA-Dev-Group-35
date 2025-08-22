@@ -13,7 +13,6 @@ const ExamsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
 
-  // This logic groups quizzes by subject. e.g., { Programming: [...], History: [...] }
   const groupedExams = useMemo(() => {
     return exams.reduce((acc, quiz) => {
       if (!acc[quiz.subject]) {
@@ -22,14 +21,13 @@ const ExamsPage: React.FC = () => {
       acc[quiz.subject].push(quiz);
       return acc;
     }, {} as Record<string, Quiz[]>);
-  }, [exams]); // Re-calculates only when the exams array changes
+  }, [exams]);
 
   const handleStartQuiz = (quiz: Quiz) => {
-
     //before navigating ensure the quiz and its _id exist
-    if (!quiz || !quiz._id){
-      console.error("Attempted to start a quiz with an invalid ID")
-      alert("Sorry, there was an error starting this quiz.")
+    if (!quiz || !quiz._id) {
+      console.error("Attempted to start a quiz with an invalid ID");
+      alert("Sorry, there was an error starting this quiz.");
       return;
     }
 
@@ -39,26 +37,23 @@ const ExamsPage: React.FC = () => {
       navigate(`/quiz/${quiz._id}`);
     } else {
       setSelectedQuiz(quiz);
-      setIsModalOpen(true); // Open the password prompt modal if the quiz is private
+      setIsModalOpen(true);
     }
   };
-
-  // Function to handle password submission from the modal
 
   const handlePasswordSubmit = (enteredPassword: string) => {
     if (selectedQuiz && enteredPassword === selectedQuiz.password) {
-      setIsModalOpen(false); // Close the modal if the password is correct
-      
-      if (selectedQuiz._id){
+      setIsModalOpen(false);
+
+      if (selectedQuiz._id) {
         navigate(`/quiz/${selectedQuiz._id}`);
-      } // Navigate to the quiz page after ensuring its presence
-      setSelectedQuiz(null); // Reset selected quiz
+      }
+      setSelectedQuiz(null);
     } else {
-      alert("Incorrect password. Please try again."); // Alert user if password is incorrect
+      alert("Incorrect password. Please try again.");
     }
   };
 
-  // Render a loading spinner while fetching data
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -67,7 +62,6 @@ const ExamsPage: React.FC = () => {
     );
   }
 
-  // Render an error message if the fetch fails
   if (error) {
     return (
       <div className="flex justify-center items-center h-screen p-8">
@@ -99,7 +93,7 @@ const ExamsPage: React.FC = () => {
                   <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-3 border-b-2 border-gray-200">
                     {subject}
                   </h2>
-                  <div className=" min-w-[325px]">
+                  <div className=" min-w-[325px] max-w-[375px]">
                     {quizzes.map((quiz) => (
                       <QuizCard
                         key={quiz._id}

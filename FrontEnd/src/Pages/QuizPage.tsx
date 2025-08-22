@@ -2,11 +2,59 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { Timer } from "../Components/quiz/Timer";
-import { QuestionPalette } from "../Components/quiz/QuestionPalette";
 import { QuestionDisplay } from "../Components/quiz/QuestionDisplay";
 import type { Quiz as BaseQuiz } from "../components/quiz/QuizCard";
 import PageWrapper from "../Components/wrapper/PageWrapper";
 
+// Updated QuestionPalette code
+type QuestionPaletteProps = {
+  totalQuestions: number;
+  answers: (number | null)[];
+  marked: boolean[];
+  currentIndex: number;
+  onSelect: (index: number) => void;
+};
+
+const QuestionPalette: React.FC<QuestionPaletteProps> = ({
+  totalQuestions,
+  answers,
+  marked,
+  currentIndex,
+  onSelect,
+}) => {
+  return (
+    <div className="bg-white p-4 rounded-lg shadow-lg">
+      <h2 className="text-lg font-semibold mb-4">Question Palette</h2>
+      <div className="grid grid-cols-5 gap-2">
+        {Array.from({ length: totalQuestions }, (_, i) => {
+          // Priority: marked for review > answered > seen > not seen
+          let statusClass = "bg-white text-gray-800 border"; // default = not seen
+          if (marked[i]) {
+            statusClass = "bg-yellow-400 text-white"; // marked for review
+          } else if (answers[i] !== null) {
+            statusClass = "bg-green-500 text-white"; // answered
+          } else if (i <= currentIndex) {
+            statusClass = "bg-gray-400 text-white"; // seen but not answered
+          }
+
+          return (
+            <button
+              key={i}
+              onClick={() => onSelect(i)}
+              className={`w-10 h-10 flex items-center justify-center rounded-full font-semibold transition-colors ${statusClass} ${
+                currentIndex === i ? "ring-2 ring-blue-500" : ""
+              }`}
+            >
+              {i + 1}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Types for questions
 type QuestionOption = {
   id: string;
   text: string;
@@ -22,8 +70,7 @@ type FullQuiz = BaseQuiz & {
   questions: QuizQuestion[];
 };
 
-
-const API_URL = 'http://localhost:4000/api';
+const API_URL = "http://localhost:4000/api";
 const QuizPage: React.FC = () => {
   const navigate = useNavigate();
   const { quizId } = useParams<{ quizId: string }>();
@@ -36,27 +83,22 @@ const QuizPage: React.FC = () => {
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [markedQuestions, setMarkedQuestions] = useState<boolean[]>([]);
 
-  // Check login and fetch quiz
   useEffect(() => {
     const checkLoginAndFetch = async () => {
       try {
-        // 1. Check login
+        // 1. Check if the person is loged in
         await axios.get(`${API_URL}/endPoints/me`, {
           withCredentials: true,
         });
 
-        // 2. Fetch quiz
         const { data } = await axios.get<FullQuiz>(
           `http://localhost:4000/api/exams/${quizId}`
         );
         setQuiz(data);
-
-        // Initialize answers and markedQuestions arrays
         setAnswers(Array(data.questions.length).fill(null));
         setMarkedQuestions(Array(data.questions.length).fill(false));
       } catch (err: any) {
         if (err.response?.status === 401) {
-          // Not logged in
           navigate("/login");
         } else {
           setError(err.message || "Something went wrong");
@@ -65,11 +107,9 @@ const QuizPage: React.FC = () => {
         setLoading(false);
       }
     };
-
     checkLoginAndFetch();
   }, [quizId, navigate]);
 
-  // Shuffle questions and options
   const shuffledQuestions = useMemo(() => {
     if (!quiz) return [];
     return quiz.questions
@@ -82,7 +122,6 @@ const QuizPage: React.FC = () => {
 
   const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
-  // Handlers
   const handleAnswerSelect = (optionIndex: number) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = optionIndex;
@@ -107,7 +146,7 @@ const QuizPage: React.FC = () => {
     setMarkedQuestions(newMarked);
   };
 
-  const handleFinish =  async() => {
+  const handleFinish = async () => {
     const answeredCount = answers.filter((a) => a !== null).length;
     const confirmation = window.confirm(
       `You have answered ${answeredCount} out of ${quiz?.questions.length} questions. Are you sure you want to finish?`
@@ -115,28 +154,24 @@ const QuizPage: React.FC = () => {
     if (confirmation) {
       try {
         //sending the answer to new backend endpoint
-        const response = await fetch (`${API_URL}/exams/${quizId}/submit`, {
-          method: 'POST',
+        const response = await fetch(`${API_URL}/exams/${quizId}/submit`, {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({answers: answers}) //this can send answers array
-        })
-        if (!response.ok){
-          throw new Error("Failed to submit your answers.")
+          body: JSON.stringify({ answers: answers }), //this can send answers array
+        });
+        if (!response.ok) {
+          throw new Error("Failed to submit your answers.");
         }
         const resultsData = await response.json();
-        navigate('/quiz/results', {state: {results: resultsData}})
-      } catch (err){
-        console.error("Submission failed", err)
-        alert("There was an error submitting your quiz, Please try again.")
+        navigate("/quiz/results", { state: { results: resultsData } });
+      } catch (err) {
+        console.error("Submission failed", err);
+        alert("There was an error submitting your quiz, Please try again.");
       }
-
     }
-
   };
-
-    
 
   const handleTimeUp = () => {
     alert("Time's up! Your quiz will be submitted automatically.");
@@ -154,6 +189,7 @@ const QuizPage: React.FC = () => {
     return (
       <div className="text-center text-red-500 mt-20 text-xl">{error}</div>
     );
+
   if (!quiz)
     return (
       <div className="text-center mt-20 text-xl">Quiz data is incomplete.</div>
@@ -219,7 +255,7 @@ const QuizPage: React.FC = () => {
           <aside className="space-y-6 lg:mt-0">
             <QuestionPalette
               totalQuestions={shuffledQuestions.length}
-              answers={answers.map((a) => (a !== null ? a : null))}
+              answers={answers}
               marked={markedQuestions}
               currentIndex={currentQuestionIndex}
               onSelect={handleQuestionSelect}
