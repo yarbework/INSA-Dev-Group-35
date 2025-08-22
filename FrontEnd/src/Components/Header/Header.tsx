@@ -242,7 +242,7 @@ export default function Header() {
                     )}
                     <li className="w-full">
                       <Link
-                        to="/profile"
+                        to="../profile"
                         onClick={() => setIsMenuOpen(false)}
                         className="w-full block px-4 py-2 rounded-lg text-center hover:bg-blue-100 transition-all duration-200"
                       >

@@ -15,6 +15,7 @@ import CreateQuiz from "./Pages/CreateQuizPage";
 import NavLayout from "./Components/NavLayout";
 import PageWrapper from "./Components/wrapper/PageWrapper";
 import ResultsPage from './pages/ResultsPage';
+import Profile from "./Pages/ProfilePage";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -47,6 +48,14 @@ function AnimatedRoutes() {
                 element={
                   <PageWrapper>
                     <About />
+                  </PageWrapper>
+                }
+              />
+              <Route
+                path="profile"
+                element={
+                  <PageWrapper>
+                    <Profile />
                   </PageWrapper>
                 }
               />

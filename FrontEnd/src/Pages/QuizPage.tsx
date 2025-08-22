@@ -23,6 +23,7 @@ type FullQuiz = BaseQuiz & {
 };
 
 
+
 const API_URL = 'http://localhost:4000/api';
 const QuizPage: React.FC = () => {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ const QuizPage: React.FC = () => {
 
         // 2. Fetch quiz
         const { data } = await axios.get<FullQuiz>(
-          `http://localhost:4000/api/exams/${quizId}`
+          `${API_URL}/exams/${quizId}`
         );
         setQuiz(data);
 
@@ -126,6 +127,22 @@ const QuizPage: React.FC = () => {
           throw new Error("Failed to submit your answers.")
         }
         const resultsData = await response.json();
+
+        try{
+            await fetch(`${API_URL}/endPoints/score`, {
+              method: 'PUT',
+              headers: {'Content-Type': 'application/json'},
+              credentials: 'include', //this sends Auth Cookie
+              body: JSON.stringify({
+                quizId: quizId,
+                subject: quiz?.subject,
+                difficulty: quiz?.difficulty,
+                score: Math.round((resultsData.correctAnswersCount / resultsData.totalQuestions)*100),
+              }),
+            });
+        }catch(scoreError){
+            console.error("Could not save score to user profile:", scoreError);
+        }
         navigate('/quiz/results', {state: {results: resultsData}})
       } catch (err){
         console.error("Submission failed", err)
