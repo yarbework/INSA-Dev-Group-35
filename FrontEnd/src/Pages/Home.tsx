@@ -4,9 +4,6 @@ import PageWrapper from "../Components/wrapper/PageWrapper";
 import FeatureCard from "../Components/FeatureCard";
 import { useAuth } from "../context/AuthContext";
 
-// import { section } from "framer-motion/client";
-// import image from "../assets/images/home.jpg";
-
 export default function Home() {
   const { isAuthenticated } = useAuth();
 
