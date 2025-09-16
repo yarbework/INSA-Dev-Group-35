@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "start": "node serve.js",
-    "dev": "nodemon server.js"
+    "start": "node src/serve.js",
+    "dev": "nodemon src/server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -20,7 +20,7 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "server.js",
-  "author": "",
+  "author": "Group-35",
   "license": "ISC",
   "description": ""
 }
