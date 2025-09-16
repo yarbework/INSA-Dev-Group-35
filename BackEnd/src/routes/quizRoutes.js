@@ -9,4 +9,5 @@ router.post("/", quizController.createQuiz, authorizeRoles("Instructor"), requir
 router.get("/:id", quizController.getQuizById, requireLogin);
 router.post("/:id/submit", quizController.submitQuiz, requireLogin);
 
+
 module.exports = router;

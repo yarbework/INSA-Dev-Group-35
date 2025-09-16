@@ -28,12 +28,14 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user || !password) return res.status(400).json({ msg: "Invalid credentials" });
 
+
     if (!user.password) return res.status(400).json({ msg: "Login not allowed via password for OAuth accounts" });
 
     const isMatch = await bcrypt.compare(password, user.password || "");
     if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
     const payload = { user: { id: user.id, role: user.role } };
+
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     res.cookie("token", token, { httpOnly: true, secure: false, sameSite: "lax", maxAge: 60*60*1000 }); //reminde me to set secure to true in proxuction
@@ -42,6 +44,7 @@ exports.login = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
 
 exports.googleCallback = async (req, res) => {
   res.cookie("token", req.user.token, {
@@ -56,6 +59,7 @@ exports.googleCallback = async (req, res) => {
 exports.googleFailure = async (req, res) => {
   res.send("Failed to authenticate with Google.");
 }
+
 
 exports.logout = (req, res) => {
   res.clearCookie("token");
