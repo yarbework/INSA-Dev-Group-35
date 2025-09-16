@@ -10,11 +10,8 @@ const scoreSchema = new mongoose.Schema({
 
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-<<<<<<< HEAD
   password: { type: String, required: false }, // null for OAuth
-=======
-  password: { type: String, required: true }, // null for OAuth
->>>>>>> bd429019043959d63796aafaa8d27815faffe070
+
   email: { type: String, required: true, unique: true, lowercase: true },
   role: { type: String, enum: ["Student", "Instructor", "Admin"], required: true },
   scores: [scoreSchema],
