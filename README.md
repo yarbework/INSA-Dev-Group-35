@@ -26,3 +26,7 @@ This project is developed with the goal of making a positive impact on education
 * Node.js A JavaScript runtime used for building scalable server-side applications. 
 * MongoDB a NoSQL database that provides high performance, high availability, and easy scalability
 * Express.js
+
+## 🚨Important
+
+This is the link to the repo that contains the desktop app https://github.com/Firaol-9/QuizGeek-Desktop-App
