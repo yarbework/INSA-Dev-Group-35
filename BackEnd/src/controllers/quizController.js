@@ -15,6 +15,7 @@ exports.createQuiz = async (req, res) => {
   
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
     req.body.author = decoded.user.id
     const newQuiz = new Quiz(req.body);
     await newQuiz.save();

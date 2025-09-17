@@ -5,7 +5,8 @@ const scoreSchema = new mongoose.Schema({
   subject: { type: String },
   difficulty: { type: String },
   score: { type: Number, required: true },
-  date: { type: Date, default: Date.now }
+  date: { type: Date, default: Date.now },
+  AiReview: { type: JSON }
 });
 
 const UserSchema = new mongoose.Schema({
