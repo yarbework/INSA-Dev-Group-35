@@ -1,24 +1,24 @@
 const Quiz = require("../models/Quiz");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const { askGemini } = require("../services/aiService");
+const {askGemini} = require("../services/aiService");
 
 // =========================
 // CREATE - POST /api/quizzes
 // =========================
 exports.createQuiz = async (req, res) => {
-  const token = req.cookies.token;
-  try {
-    if (!token) return res.status(401).json({ msg: "Unauthorized" });
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.body.author = decoded.user.id;
+    const token = req.cookies.token;
+    try {
+        if (!token) return res.status(401).json({msg: "Unauthorized"});
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.body.author = decoded.user.id;
 
-    const newQuiz = new Quiz(req.body);
-    await newQuiz.save();
-    res.status(201).json(newQuiz);
-  } catch (err) {
-    res.status(400).json({ msg: "Failed to create quiz", error: err.message });
-  }
+        const newQuiz = new Quiz(req.body);
+        await newQuiz.save();
+        res.status(201).json(newQuiz);
+    } catch (err) {
+        res.status(400).json({msg: "Failed to create quiz", error: err.message});
+    }
 };
 
 // =========================
@@ -47,7 +47,7 @@ exports.getQuizzes = async (req, res) => {
             totalPages: Math.ceil(total / perPage)
         });
     } catch (err) {
-        res.status(500).json({ msg: "Server error", error: err.message });
+        res.status(500).json({msg: "Server error", error: err.message});
     }
 };
 
@@ -55,89 +55,108 @@ exports.getQuizzes = async (req, res) => {
 //===========================
 // READ - GET /api/myQuizzes
 //==========================
-
 exports.myQuizzes = async (req, res) => {
-  const token = req.cookies.token
-  
-  try{
-    if (!token) return res.status(401).json({ msg: "Unauthorized" });
+    const token = req.cookies.token;
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    const user = decoded.user
+    try {
 
-    const quizzes = await Quiz.find({author: user.id})
+        if (!token) return res.status(401).json({ msg: "Unauthorized" });
 
-    if (!quizzes) return res.status(400).json({msg: "no quizzes found"})
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = decoded.user;
 
-    res.json(quizzes)
-  }
-  catch (err){
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
-}
+
+        const page = parseInt(req.query.page) || 1;
+        const perPage = 20;
+
+
+        const total = await Quiz.countDocuments({ author: user.id });
+
+
+        const quizzes = await Quiz.find({ author: user.id })
+            .skip((page - 1) * perPage)
+            .limit(perPage);
+
+
+        if (quizzes.length === 0) {
+            return res.status(404).json({ msg: "No quizzes found" });
+        }
+
+
+        res.json({
+            quizzes,
+            totalItems: total,
+            currentPage: page,
+            totalPages: Math.ceil(total / perPage),
+        });
+    } catch (err) {
+        res.status(500).json({ msg: "Server error", error: err.message });
+    }
+};
+
 
 // =========================
 // READ - GET /api/quizzes/:id
 // =========================
 exports.getQuizById = async (req, res) => {
-  try {
-    const quiz = await Quiz.findById(req.params.id);
-    if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
-    res.json(quiz);
-  } catch (err) {
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
+    try {
+        const quiz = await Quiz.findById(req.params.id);
+        if (!quiz) return res.status(404).json({msg: "Quiz not found"});
+        res.json(quiz);
+    } catch (err) {
+        res.status(500).json({msg: "Server error", error: err.message});
+    }
 };
 
 // =========================
 // UPDATE - PUT /api/quizzes/:id
 // =========================
 exports.editQuiz = async (req, res) => {
-  const token = req.cookies.token
-  try {
-    if (!token){
-      return res.status(401).json({msg: "Unauthorized"})
+    const token = req.cookies.token
+    try {
+        if (!token) {
+            return res.status(401).json({msg: "Unauthorized"})
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        const sentUser = decoded.user
+
+        if (sentUser.role !== "Instructor") {
+            return res.status(401).json({msg: "Unauthorized"})
+        }
+
+        // Find the quiz by ID
+        const quiz = await Quiz.findById(req.params.id);
+        if (!quiz) return res.status(404).json({msg: "Quiz not found"});
+
+        if (quiz.author !== sentUser.id) {
+            return res.status(401).json({msg: "Unauthorized"})
+        }
+
+        // Update only the fields provided in req.body
+        Object.keys(req.body).forEach((key) => {
+            quiz[key] = req.body[key];
+        });
+
+        // Save the updated quiz
+        await quiz.save();
+
+        res.json(quiz); // Return the updated quiz
+    } catch (err) {
+        res.status(400).json({msg: "Failed to edit quiz", error: err.message});
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    const sentUser = decoded.user
-
-    if (sentUser.role !== "Instructor"){
-      return res.status(401).json({msg: "Unauthorized"})
-    }
-
-    // Find the quiz by ID
-    const quiz = await Quiz.findById(req.params.id);
-    if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
-
-    if (quiz.author !== sentUser.id){
-      return res.status(401).json({msg: "Unauthorized"})
-    }
-
-    // Update only the fields provided in req.body
-    Object.keys(req.body).forEach((key) => {
-      quiz[key] = req.body[key];
-    });
-
-    // Save the updated quiz
-    await quiz.save();
-
-    res.json(quiz); // Return the updated quiz
-  } catch (err) {
-    res.status(400).json({ msg: "Failed to edit quiz", error: err.message });
-  }
 };
 
 // =========================
 // DELETE - DELETE /api/quizzes/:id
 // =========================
 exports.deleteQuiz = async (req, res) => {
-  try {
-    const quiz = await Quiz.findByIdAndDelete(req.params.id);
-    if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
-    res.json({ msg: "Quiz deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
+    try {
+        const quiz = await Quiz.findByIdAndDelete(req.params.id);
+        if (!quiz) return res.status(404).json({msg: "Quiz not found"});
+        res.json({msg: "Quiz deleted successfully"});
+    } catch (err) {
+        res.status(500).json({msg: "Server error", error: err.message});
+    }
 };
 
 // =========================
@@ -145,66 +164,82 @@ exports.deleteQuiz = async (req, res) => {
 // Submit answers and calculate score
 // =========================
 exports.submitQuiz = async (req, res) => {
-  try {
-    const { answers } = req.body;
-    const quiz = await Quiz.findById(req.params.id);
-    if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
+    try {
+        const { answers } = req.body;
 
-    // this assumes none will be sent in place of answers that are not provided
-    let score = 0;
-    quiz.questions.forEach((q, index) => {
-      if (answers[index] === q.correctAnswerIndex) score++;
-    });
+        // Validate answers
+        if (!answers || !Array.isArray(answers)) {
+            return res.status(400).json({ msg: "Answers must be provided as an array" });
+        }
 
-    res.json({ msg: "Quiz submitted successfully", score, total: quiz.questions.length });
-  } catch (err) {
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
+        // Find quiz
+        const quiz = await Quiz.findById(req.params.id);
+        if (!quiz) {
+            return res.status(404).json({ msg: "Quiz not found" });
+        }
+
+        // Calculate score
+        let score = 0;
+        quiz.questions.forEach((q, index) => {
+            if (answers[index] !== undefined && answers[index] === q.correctAnswerIndex) {
+                score++;
+            }
+        });
+
+        res.json({
+            msg: "Quiz submitted successfully",
+            score,
+            total: quiz.questions.length,
+        });
+    } catch (err) {
+        res.status(500).json({ msg: "Server error", error: err.message });
+    }
 };
+
 
 // =========================
 // CUSTOM - POST /api/quizzes/:id/ai-assessment
 // Optional AI assessment for user's answers
 // =========================
 exports.getAiAssessment = async (req, res) => {
-  const token = req.cookies.token
-  try {
-    if (!token){
-      return res.status(401).json({msg: "Unauthorized"})
+    const token = req.cookies.token
+    try {
+        if (!token) {
+            return res.status(401).json({msg: "Unauthorized"})
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        const sentUser = decoded.user
+
+        const user = await User.findById(sentUser.id);
+        if (!user) return res.status(404).json({msg: "User not found"});
+
+        const quizId = req.body.quizId || req.params.id;
+        if (!quizId) return res.status(400).json({msg: "Quiz ID is required"});
+
+        const quiz = await Quiz.findById(quizId);
+        if (!quiz) return res.status(404).json({msg: "Quiz not found"});
+
+        // Return existing AI review if present
+        if (user.score?.[quizId]?.AiReview) return res.json(user.score[quizId].AiReview);
+
+        // Prepare AI request
+        const questionPayload = {
+            instruction: "Provide a detailed AI assessment for the user answers. Format the response as an object with keys 'question', 'correctAnswer', 'userAnswer', 'feedback', and 'score'. Do not add any extra text.",
+            questions: quiz.questions,
+            user_answers: req.body.answers,
+        };
+
+        const aiResponse = await askGemini(questionPayload);
+
+        // Save AI review
+        if (!user.score) user.score = {};
+        user.score[quizId] = {...user.score[quizId], AiReview: aiResponse};
+        await user.save();
+
+        res.json(user.score[quizId].AiReview);
+    } catch (err) {
+        console.error("AI assessment error:", err);
+        res.status(500).json({msg: "Server error", error: err.message});
     }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    const sentUser = decoded.user
-
-    const user = await User.findById(sentUser.id);
-    if (!user) return res.status(404).json({ msg: "User not found" });
-
-    const quizId = req.body.quizId || req.params.id;
-    if (!quizId) return res.status(400).json({ msg: "Quiz ID is required" });
-
-    const quiz = await Quiz.findById(quizId);
-    if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
-
-    // Return existing AI review if present
-    if (user.score?.[quizId]?.AiReview) return res.json(user.score[quizId].AiReview);
-
-    // Prepare AI request
-    const questionPayload = {
-      instruction: "Provide a detailed AI assessment for the user answers. Format the response as an object with keys 'question', 'correctAnswer', 'userAnswer', 'feedback', and 'score'. Do not add any extra text.",
-      questions: quiz.questions,
-      user_answers: req.body.answers,
-    };
-
-    const aiResponse = await askGemini(questionPayload);
-
-    // Save AI review
-    if (!user.score) user.score = {};
-    user.score[quizId] = { ...user.score[quizId], AiReview: aiResponse };
-    await user.save();
-
-    res.json(user.score[quizId].AiReview);
-  } catch (err) {
-    console.error("AI assessment error:", err);
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
 };
