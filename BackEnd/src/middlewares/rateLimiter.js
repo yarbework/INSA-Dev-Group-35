@@ -13,3 +13,14 @@ exports.signUpLimiter = rateLimit({
   statusCode: 429,
   message: { message: "Too many sign-up attempts, please try again later" }
 });
+
+exports.aiLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000,
+    max: 3,
+    message: {
+        msg: "Too many AI requests. Please try again after 5 minutes."
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+

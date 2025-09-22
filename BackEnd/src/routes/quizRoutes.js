@@ -1,18 +1,32 @@
 const express = require("express");
 const router = express.Router();
 const quizController = require("../controllers/quizController");
-const { authorizeRoles, requireLogin } = require("../middlewares/authMiddleware"); // use it when you wanna role based dessions
-const validateQuizData = require("../middlewares/validateQuizData")
-// const aiAssessment = require("../services/aiService")
+const { authorizeRoles, requireLogin } = require("../middlewares/authMiddleware");
+const validateQuizData = require("../middlewares/validateQuizData");
+const {aiLimiter} = require("../middlewares/rateLimiter");
 
-
+// Public GET quizzes
 router.get("/", quizController.getQuizzes);
-router.post("/", quizController.createQuiz, requireLogin, authorizeRoles("Instructor"),  validateQuizData);
-router.get("/:id", quizController.getQuizById, requireLogin);
-router.post("/:id/submit", quizController.submitQuiz, requireLogin);
-router.post("/ai-assessment", quizController.getAiAssessment, requireLogin)
-router.put("/:id", quizController.editQuiz, requireLogin, validateQuizData)
-router.get("/myQuizzes", quizController.myQuizzes, requireLogin, authorizeRoles("Instructor"));
 
+// Create quiz - only Instructor
+router.post("/", requireLogin, authorizeRoles("Instructor"), validateQuizData, quizController.createQuiz);
+
+// Get quiz by ID - require login
+router.get("/:id", requireLogin, quizController.getQuizById);
+
+// Submit quiz
+router.post("/:id/submit", requireLogin, quizController.submitQuiz);
+
+// AI assessment
+router.post("/:id/ai-assessment", requireLogin, aiLimiter, quizController.getAiAssessment);
+
+// Edit quiz - only Instructor
+router.put("/:id", requireLogin, authorizeRoles("Instructor"), validateQuizData, quizController.editQuiz);
+
+// Delete quiz - only Instructor
+router.delete("/:id", requireLogin, authorizeRoles("Instructor"), quizController.deleteQuiz);
+
+// Get my quizzes
+router.get("/myQuizzes", requireLogin, quizController.myQuizzes);
 
 module.exports = router;
