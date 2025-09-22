@@ -2,6 +2,8 @@ const Quiz = require("../models/Quiz");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const {askGemini} = require("../services/aiService");
+const redisClient = require("../config/redis"); // your redis.js file
+
 
 // =========================
 // CREATE - POST /api/quizzes
@@ -15,6 +17,8 @@ exports.createQuiz = async (req, res) => {
 
         const newQuiz = new Quiz(req.body);
         await newQuiz.save();
+        //delet the invalid catch, there is a better way doing this but this is the easiet approach
+        await redisClient.flushAll();
         res.status(201).json(newQuiz);
     } catch (err) {
         res.status(400).json({msg: "Failed to create quiz", error: err.message});
@@ -26,28 +30,36 @@ exports.createQuiz = async (req, res) => {
 // =========================
 exports.getQuizzes = async (req, res) => {
     try {
-
         let page = parseInt(req.query.page) || 1;
         const perPage = 20;
+        const cacheKey = `quizzes:page:${page}`;
 
+        // look if the data is in the catch
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return res.json(JSON.parse(cached));
+        }
 
+        // load it from the database
         const total = await Quiz.countDocuments();
-
-
         const quizzes = await Quiz.find()
             .skip((page - 1) * perPage)
             .limit(perPage)
-            .select("-questions"); // exclude questions in list view
+            .select("-questions");
 
-
-        res.json({
+        const result = {
             quizzes,
             totalItems: total,
             currentPage: page,
-            totalPages: Math.ceil(total / perPage)
-        });
+            totalPages: Math.ceil(total / perPage),
+        };
+
+        // Save in cache
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(result));
+
+        res.json(result);
     } catch (err) {
-        res.status(500).json({msg: "Server error", error: err.message});
+        res.status(500).json({ msg: "Server error", error: err.message });
     }
 };
 
@@ -57,56 +69,70 @@ exports.getQuizzes = async (req, res) => {
 //==========================
 exports.myQuizzes = async (req, res) => {
     const token = req.cookies.token;
-
     try {
-
         if (!token) return res.status(401).json({ msg: "Unauthorized" });
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = decoded.user;
 
-
         const page = parseInt(req.query.page) || 1;
         const perPage = 20;
+        const cacheKey = `myQuizzes:${user.id}:page:${page}`;
 
+        // look in the catch
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return res.json(JSON.parse(cached));
+        }
 
+        // 2. load form the database
         const total = await Quiz.countDocuments({ author: user.id });
-
-
         const quizzes = await Quiz.find({ author: user.id })
             .skip((page - 1) * perPage)
             .limit(perPage);
-
 
         if (quizzes.length === 0) {
             return res.status(404).json({ msg: "No quizzes found" });
         }
 
-
-        res.json({
+        const result = {
             quizzes,
             totalItems: total,
             currentPage: page,
             totalPages: Math.ceil(total / perPage),
-        });
+        };
+
+        //  Save in cache
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(result));
+
+        res.json(result);
     } catch (err) {
         res.status(500).json({ msg: "Server error", error: err.message });
     }
 };
-
 
 // =========================
 // READ - GET /api/quizzes/:id
 // =========================
 exports.getQuizById = async (req, res) => {
     try {
+        const cacheKey = `quiz:${req.params.id}`;
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return res.json(JSON.parse(cached));
+        }
+
         const quiz = await Quiz.findById(req.params.id);
-        if (!quiz) return res.status(404).json({msg: "Quiz not found"});
+        if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
+
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(quiz));
+
         res.json(quiz);
     } catch (err) {
-        res.status(500).json({msg: "Server error", error: err.message});
+        res.status(500).json({ msg: "Server error", error: err.message });
     }
 };
+
 
 // =========================
 // UPDATE - PUT /api/quizzes/:id
@@ -139,6 +165,9 @@ exports.editQuiz = async (req, res) => {
 
         // Save the updated quiz
         await quiz.save();
+        //delet the invalid catch, there is a better way doing this but this is the easiet approach
+        await redisClient.flushAll();
+
 
         res.json(quiz); // Return the updated quiz
     } catch (err) {
@@ -152,6 +181,8 @@ exports.editQuiz = async (req, res) => {
 exports.deleteQuiz = async (req, res) => {
     try {
         const quiz = await Quiz.findByIdAndDelete(req.params.id);
+        //delet the invalid catch, there is a better way doing this but this is the easiet approach
+        await redisClient.flushAll();
         if (!quiz) return res.status(404).json({msg: "Quiz not found"});
         res.json({msg: "Quiz deleted successfully"});
     } catch (err) {
@@ -185,7 +216,8 @@ exports.submitQuiz = async (req, res) => {
                 score++;
             }
         });
-
+        //delet the invalid catch, there is a better way doing this but this is the easiet approach
+        await redisClient.flushAll();
         res.json({
             msg: "Quiz submitted successfully",
             score,

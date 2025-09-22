@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 function authorizeRoles(...allowedRoles) {
   return (req, res, next) => {
@@ -24,13 +25,24 @@ function authorizeRoles(...allowedRoles) {
   };
 }
 
-function requireLogin(req, res){
+function requireLogin(req, res, next) {
     const token = req.cookies.token;
 
-    if (!token){
-        return res.status(401).json({msg: "Not authenticated. Please log in."})
+    if (!token) {
+        return res.status(401).json({ msg: "Not authenticated. Please log in." });
     }
 
+    try {
+        // Verify JWT
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Attach user info to request for controllers
+        req.user = { id: decoded.user.id, role: decoded.user.role };
+
+        next(); // continue to the next middleware/controller
+    } catch (err) {
+        return res.status(401).json({ msg: "Invalid or expired token" });
+    }
 }
 
 module.exports = { authorizeRoles, requireLogin };
