@@ -38,7 +38,7 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    res.cookie("token", token, { httpOnly: true, secure: false, sameSite: "lax", maxAge: 60*60*1000 }); //reminde me to set secure to true in proxuction
+    res.cookie("token", token, { httpOnly: true, secure: false, sameSite: "lax", maxAge: 60*60*1000 }); //remind me to set secure to true in production
     res.json({ msg: "Login successful", success: true });
   } catch (err) {
     res.status(500).send("Server Error");

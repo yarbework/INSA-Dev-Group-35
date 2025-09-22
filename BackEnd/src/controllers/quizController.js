@@ -25,13 +25,32 @@ exports.createQuiz = async (req, res) => {
 // READ - GET /api/quizzes
 // =========================
 exports.getQuizzes = async (req, res) => {
-  try {
-    const quizzes = await Quiz.find().select("-questions"); // List view, exclude questions
-    res.json(quizzes);
-  } catch (err) {
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
+    try {
+
+        let page = parseInt(req.query.page) || 1;
+        const perPage = 20;
+
+
+        const total = await Quiz.countDocuments();
+
+
+        const quizzes = await Quiz.find()
+            .skip((page - 1) * perPage)
+            .limit(perPage)
+            .select("-questions"); // exclude questions in list view
+
+
+        res.json({
+            quizzes,
+            totalItems: total,
+            currentPage: page,
+            totalPages: Math.ceil(total / perPage)
+        });
+    } catch (err) {
+        res.status(500).json({ msg: "Server error", error: err.message });
+    }
 };
+
 
 //===========================
 // READ - GET /api/myQuizzes
@@ -74,7 +93,7 @@ exports.getQuizById = async (req, res) => {
 // UPDATE - PUT /api/quizzes/:id
 // =========================
 exports.editQuiz = async (req, res) => {
-  token = req.cookies.token
+  const token = req.cookies.token
   try {
     if (!token){
       return res.status(401).json({msg: "Unauthorized"})
@@ -82,7 +101,7 @@ exports.editQuiz = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const sentUser = decoded.user
 
-    if (sentUser.role != "Instructor"){
+    if (sentUser.role !== "Instructor"){
       return res.status(401).json({msg: "Unauthorized"})
     }
 
@@ -90,7 +109,7 @@ exports.editQuiz = async (req, res) => {
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
 
-    if (quiz.author != sentUser.id){
+    if (quiz.author !== sentUser.id){
       return res.status(401).json({msg: "Unauthorized"})
     }
 
@@ -131,6 +150,7 @@ exports.submitQuiz = async (req, res) => {
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
 
+    // this assumes none will be sent in place of answers that are not provided
     let score = 0;
     quiz.questions.forEach((q, index) => {
       if (answers[index] === q.correctAnswerIndex) score++;

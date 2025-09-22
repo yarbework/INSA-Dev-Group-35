@@ -7,11 +7,12 @@ const validateQuizData = require("../middlewares/validateQuizData")
 
 
 router.get("/", quizController.getQuizzes);
-router.post("/", quizController.createQuiz, authorizeRoles("Instructor"), requireLogin, validateQuizData);
+router.post("/", quizController.createQuiz, requireLogin, authorizeRoles("Instructor"),  validateQuizData);
 router.get("/:id", quizController.getQuizById, requireLogin);
 router.post("/:id/submit", quizController.submitQuiz, requireLogin);
 router.post("/ai-assessment", quizController.getAiAssessment, requireLogin)
 router.put("/:id", quizController.editQuiz, requireLogin, validateQuizData)
+router.get("/myQuizzes", quizController.myQuizzes, requireLogin, authorizeRoles("Instructor"));
 
 
 module.exports = router;

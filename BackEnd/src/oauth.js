@@ -27,8 +27,7 @@ passport.use(
       }
 
       // Create JWT token
-      const token = jwt.sign({ user: { id: user._id } }, process.env.JWT_SECRET, { expiresIn: "1h" });
-      user.token = token;
+        user.token = jwt.sign({user: {id: user._id}}, process.env.JWT_SECRET, {expiresIn: "1h"});
 
       return done(null, user);
     } catch (err) {
