@@ -14,6 +14,7 @@ const questionSchema = Joi.object({
 const quizSchema = Joi.object({
   title: Joi.string().required(),
   subject: Joi.string().required(),
+    author: Joi.string().required(),
   difficulty: Joi.string().valid("Easy", "Medium", "Hard").required(),
   timeLimit: Joi.number().required(),
   privacy: Joi.string().valid("public", "private").required(),
