@@ -29,4 +29,10 @@ router.delete("/:id", requireLogin, authorizeRoles("Instructor"), quizController
 // Get my quizzes
 router.get("/myQuizzes", requireLogin, quizController.myQuizzes);
 
+// Question management (Instructor only)
+router.post("/:quizId/questions", requireLogin, authorizeRoles("Instructor"), quizController.addQuestion);
+router.put("/:quizId/questions/:questionId", requireLogin, authorizeRoles("Instructor"), quizController.editQuestion);
+router.delete("/:quizId/questions/:questionId", requireLogin, authorizeRoles("Instructor"), quizController.deleteQuestion);
+
+
 module.exports = router;

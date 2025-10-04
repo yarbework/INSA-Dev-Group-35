@@ -23,4 +23,13 @@ router.get(
 );
 router.get("/google/failure", authController.googleFailure);
 
+// Password management
+router.post("/change-password", requireLogin, authController.changePassword);
+router.post("/forgot-password", authController.forgotPassword);
+router.post("/reset-password/:token", authController.resetPassword);
+
+// Refresh token
+router.post("/refresh", authController.refreshToken);
+
+
 module.exports = router;

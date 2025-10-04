@@ -27,6 +27,13 @@ app.use("/api/auth", authRoutes);
 app.use("/api/quizzes", quizRoutes);
 app.use("/auth", authRoutes);
 
-
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
 
 module.exports = app;

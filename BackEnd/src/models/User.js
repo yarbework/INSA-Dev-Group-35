@@ -1,31 +1,40 @@
 const mongoose = require("mongoose");
 
-const scoreSchema = new mongoose.Schema({
-  subject: { type: String },
-  difficulty: { type: String },
-  score: { type: Number, required: true },
-  date: { type: Date, default: Date.now },
-  AiReview: { type: mongoose.Schema.Types.Mixed, default: "" }
-});
-
-
 const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: false }, // null for OAuth
-  email: { type: String, required: true, unique: true, lowercase: true },
-  role: { type: String, enum: ["Student", "Instructor", "Admin"], required: true },
-
-
+  username: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: String,
+  role: { 
+    type: String, 
+    enum: ["Student", "Instructor"], 
+    default: "Student",
+    required: true 
+  },
+  
+  // Student specific fields
+  school: String,
+  grade: String,
+  section: String,
+  profilePicture: String,
+  
+  // OAuth fields
+  googleId: String,
+  refreshToken: String,
+  
+  // Password reset
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
+  
+  // Quiz scores and performance tracking
   scores: {
     type: Map,
-    of: scoreSchema,
-    default: {}
-  },
-
-  profilePicture: { type: String, default: '' },
-  school: { type: String, default: '' },
-  grade: { type: String, default: '' },
-  section: { type: String, default: '' }
+    of: {
+      score: Number,
+      total: Number,
+      timestamp: Date,
+      AiReview: String
+    }
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", UserSchema);

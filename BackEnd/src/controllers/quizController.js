@@ -9,19 +9,15 @@ const redisClient = require("../config/redis"); // your redis.js file
 // CREATE - POST /api/quizzes
 // =========================
 exports.createQuiz = async (req, res) => {
-    const token = req.cookies.token;
     try {
-        if (!token) return res.status(401).json({msg: "Unauthorized"});
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.body.author = decoded.user.id;
-
+        req.body.author = req.user.id;
         const newQuiz = new Quiz(req.body);
         await newQuiz.save();
-        //delet the invalid catch, there is a better way doing this but this is the easiet approach
+
         await redisClient.flushAll();
         res.status(201).json(newQuiz);
     } catch (err) {
-        res.status(400).json({msg: "Failed to create quiz", error: err.message});
+        res.status(400).json({ msg: "Failed to create quiz", error: err.message });
     }
 };
 
@@ -32,17 +28,22 @@ exports.getQuizzes = async (req, res) => {
     try {
         let page = parseInt(req.query.page) || 1;
         const perPage = 20;
-        const cacheKey = `quizzes:page:${page}`;
 
-        // look if the data is in the catch
+        // Filters from query
+        const filter = {};
+        if (req.query.subject) filter.subject = req.query.subject;
+        if (req.query.difficulty) filter.difficulty = req.query.difficulty;
+
+        const cacheKey = `quizzes:page:${page}:subject:${req.query.subject || "all"}:difficulty:${req.query.difficulty || "all"}`;
+
+        // Look in cache
         const cached = await redisClient.get(cacheKey);
         if (cached) {
             return res.json(JSON.parse(cached));
         }
 
-        // load it from the database
-        const total = await Quiz.countDocuments();
-        const quizzes = await Quiz.find()
+        const total = await Quiz.countDocuments(filter);
+        const quizzes = await Quiz.find(filter)
             .skip((page - 1) * perPage)
             .limit(perPage)
             .select("-questions");
@@ -68,32 +69,21 @@ exports.getQuizzes = async (req, res) => {
 // READ - GET /api/myQuizzes
 //==========================
 exports.myQuizzes = async (req, res) => {
-    const token = req.cookies.token;
     try {
-        if (!token) return res.status(401).json({ msg: "Unauthorized" });
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = decoded.user;
-
         const page = parseInt(req.query.page) || 1;
         const perPage = 20;
-        const cacheKey = `myQuizzes:${user.id}:page:${page}`;
+        const userId = req.user.id;
 
-        // look in the catch
+        const cacheKey = `myQuizzes:${userId}:page:${page}`;
         const cached = await redisClient.get(cacheKey);
-        if (cached) {
-            return res.json(JSON.parse(cached));
-        }
+        if (cached) return res.json(JSON.parse(cached));
 
-        // 2. load form the database
-        const total = await Quiz.countDocuments({ author: user.id });
-        const quizzes = await Quiz.find({ author: user.id })
+        const total = await Quiz.countDocuments({ author: userId });
+        const quizzes = await Quiz.find({ author: userId })
             .skip((page - 1) * perPage)
             .limit(perPage);
 
-        if (quizzes.length === 0) {
-            return res.status(404).json({ msg: "No quizzes found" });
-        }
+        if (quizzes.length === 0) return res.status(404).json({ msg: "No quizzes found" });
 
         const result = {
             quizzes,
@@ -102,9 +92,7 @@ exports.myQuizzes = async (req, res) => {
             totalPages: Math.ceil(total / perPage),
         };
 
-        //  Save in cache
         await redisClient.setEx(cacheKey, 3600, JSON.stringify(result));
-
         res.json(result);
     } catch (err) {
         res.status(500).json({ msg: "Server error", error: err.message });
@@ -138,40 +126,30 @@ exports.getQuizById = async (req, res) => {
 // UPDATE - PUT /api/quizzes/:id
 // =========================
 exports.editQuiz = async (req, res) => {
-    const token = req.cookies.token
     try {
-        if (!token) {
-            return res.status(401).json({msg: "Unauthorized"})
-        }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const sentUser = decoded.user
+        const sentUser = req.user;
 
         if (sentUser.role !== "Instructor") {
-            return res.status(401).json({msg: "Unauthorized"})
+            return res.status(403).json({ msg: "Unauthorized" });
         }
 
-        // Find the quiz by ID
         const quiz = await Quiz.findById(req.params.id);
-        if (!quiz) return res.status(404).json({msg: "Quiz not found"});
+        if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
 
-        if (quiz.author !== sentUser.id) {
-            return res.status(401).json({msg: "Unauthorized"})
+        if (quiz.author.toString() !== sentUser.id) {
+            return res.status(403).json({ msg: "Unauthorized" });
         }
 
-        // Update only the fields provided in req.body
         Object.keys(req.body).forEach((key) => {
             quiz[key] = req.body[key];
         });
 
-        // Save the updated quiz
         await quiz.save();
-        //delet the invalid catch, there is a better way doing this but this is the easiet approach
         await redisClient.flushAll();
 
-
-        res.json(quiz); // Return the updated quiz
+        res.json(quiz);
     } catch (err) {
-        res.status(400).json({msg: "Failed to edit quiz", error: err.message});
+        res.status(400).json({ msg: "Failed to edit quiz", error: err.message });
     }
 };
 
@@ -216,6 +194,8 @@ exports.submitQuiz = async (req, res) => {
                 score++;
             }
         });
+
+
         //delet the invalid catch, there is a better way doing this but this is the easiet approach
         await redisClient.flushAll();
         res.json({
@@ -234,44 +214,104 @@ exports.submitQuiz = async (req, res) => {
 // Optional AI assessment for user's answers
 // =========================
 exports.getAiAssessment = async (req, res) => {
-    const token = req.cookies.token
     try {
-        if (!token) {
-            return res.status(401).json({msg: "Unauthorized"})
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const sentUser = decoded.user
-
+        const sentUser = req.user;
         const user = await User.findById(sentUser.id);
-        if (!user) return res.status(404).json({msg: "User not found"});
+        if (!user) return res.status(404).json({ msg: "User not found" });
 
         const quizId = req.body.quizId || req.params.id;
-        if (!quizId) return res.status(400).json({msg: "Quiz ID is required"});
+        if (!quizId) return res.status(400).json({ msg: "Quiz ID is required" });
 
         const quiz = await Quiz.findById(quizId);
-        if (!quiz) return res.status(404).json({msg: "Quiz not found"});
+        if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
 
-        // Return existing AI review if present
-        if (user.score?.[quizId]?.AiReview) return res.json(user.score[quizId].AiReview);
+        if (user.scores?.[quizId]?.AiReview) {
+            return res.json(user.scores[quizId].AiReview);
+        }
 
-        // Prepare AI request
         const questionPayload = {
-            instruction: "Provide a detailed AI assessment for the user answers. Format the response as an object with keys 'question', 'correctAnswer', 'userAnswer', 'feedback', and 'score'. Do not add any extra text.",
+            instruction: "Provide a detailed AI assessment...",
             questions: quiz.questions,
             user_answers: req.body.answers,
         };
 
         const aiResponse = await askGemini(questionPayload);
 
-        // Save AI review
-        if (!user.score) user.score = {};
-        user.score[quizId] = {...user.score[quizId], AiReview: aiResponse};
+        if (!user.scores) user.scores = {};
+        user.scores[quizId] = { ...user.scores[quizId], AiReview: aiResponse };
         await user.save();
 
-        res.json(user.score[quizId].AiReview);
+        res.json(user.scores[quizId].AiReview);
     } catch (err) {
         console.error("AI assessment error:", err);
-        res.status(500).json({msg: "Server error", error: err.message});
+        res.status(500).json({ msg: "Server error", error: err.message });
+    }
+};
+
+// =========================
+// ADD QUESTION - POST /api/quizzes/:quizId/questions
+// =========================
+exports.addQuestion = async (req, res) => {
+    try {
+        const { text, options, correctAnswerIndex } = req.body;
+        if (!text || !options || correctAnswerIndex === undefined) {
+            return res.status(400).json({ msg: "All question fields are required" });
+        }
+
+        const quiz = await Quiz.findById(req.params.quizId);
+        if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
+
+        quiz.questions.push({ text, options, correctAnswerIndex });
+        await quiz.save();
+        await redisClient.flushAll();
+
+        res.status(201).json({ msg: "Question added", quiz });
+    } catch (err) {
+        res.status(500).json({ msg: "Server error", error: err.message });
+    }
+};
+
+// =========================
+// EDIT QUESTION - PUT /api/quizzes/:quizId/questions/:questionId
+// =========================
+exports.editQuestion = async (req, res) => {
+    try {
+        const quiz = await Quiz.findById(req.params.quizId);
+        if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
+
+        const question = quiz.questions.id(req.params.questionId);
+        if (!question) return res.status(404).json({ msg: "Question not found" });
+
+        Object.keys(req.body).forEach((key) => {
+            question[key] = req.body[key];
+        });
+
+        await quiz.save();
+        await redisClient.flushAll();
+
+        res.json({ msg: "Question updated", quiz });
+    } catch (err) {
+        res.status(500).json({ msg: "Server error", error: err.message });
+    }
+};
+
+// =========================
+// DELETE QUESTION - DELETE /api/quizzes/:quizId/questions/:questionId
+// =========================
+exports.deleteQuestion = async (req, res) => {
+    try {
+        const quiz = await Quiz.findById(req.params.quizId);
+        if (!quiz) return res.status(404).json({ msg: "Quiz not found" });
+
+        const question = quiz.questions.id(req.params.questionId);
+        if (!question) return res.status(404).json({ msg: "Question not found" });
+
+        question.remove();
+        await quiz.save();
+        await redisClient.flushAll();
+
+        res.json({ msg: "Question deleted", quiz });
+    } catch (err) {
+        res.status(500).json({ msg: "Server error", error: err.message });
     }
 };
