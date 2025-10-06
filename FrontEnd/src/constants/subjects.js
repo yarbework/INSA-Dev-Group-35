@@ -140,3 +140,4 @@ export const normalizeSubject = (subjectInput) => {
   const matches = findMatchingSubject(subjectInput);
   return matches.length > 0 ? matches[0].name : subjectInput;
 };
+
